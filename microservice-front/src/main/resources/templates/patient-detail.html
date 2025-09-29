@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails du Patient</title>
+</head>
+<body>
+<h1>Détails du Patient</h1>
+<p><strong>Prénom :</strong> <span th:text="${patient.prenom}"></span></p>
+<p><strong>Nom :</strong> <span th:text="${patient.nom}"></span></p>
+<p><strong>Date de naissance :</strong> <span th:text="${patient.dateNaissance}"></span></p>
+<p><strong>Genre :</strong> <span th:text="${patient.genre}"></span></p>
+<p><strong>Adresse :</strong> <span th:text="${patient.adresse}"></span></p>
+<p><strong>Téléphone :</strong> <span th:text="${patient.telephone}"></span></p>
+
+<a href="/patients">Retour à la liste</a>
+</body>
+</html>
