@@ -1,0 +1,72 @@
+
+services:
+  # -------------------------
+  # Base de données MySQL
+  # -------------------------
+  db:
+    image: mysql:8.0
+    container_name: projet9-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: projet9db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - projet9-network
+
+  # -------------------------
+  # Microservice back
+  # -------------------------
+  back:
+    build: ../Projet_92/microservice-back
+    container_name: projet9-back
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/projet9db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: userpassword
+    depends_on:
+      - db
+    networks:
+      - projet9-network
+
+  # -------------------------
+  # Microservice front
+  # -------------------------
+  front:
+    build: ../Projet_92/microservice-front
+    container_name: projet9-front
+    ports:
+      - "3000:3000"  # selon ton front (ex: React ou Spring)
+    networks:
+      - projet9-network
+
+  # -------------------------
+  # Microservice gateway
+  # -------------------------
+  gateway:
+    build: ../Projet_92/microservice-gateway
+    container_name: projet9-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - back
+    networks:
+      - projet9-network
+
+# -------------------------
+# Réseau interne
+# -------------------------
+networks:
+  projet9-network:
+
+# -------------------------
+# Volume persistant pour MySQL
+# -------------------------
+volumes:
+  db-data:
