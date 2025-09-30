@@ -1,50 +1,45 @@
 
-version: "3.9"
-
 services:
   db:
     image: mysql:8.0
-    container_name: mysql_db
+    container_name: mysql-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root        # mot de passe root obligatoire
-      MYSQL_DATABASE: patientdb        # base créée automatiquement
-      MYSQL_USER: user                 # utilisateur applicatif
-      MYSQL_PASSWORD: password         # mot de passe utilisateur
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: patientdb
+      MYSQL_USER: medilabo
+      MYSQL_PASSWORD: medipass
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
   back:
-    build:
-      context: ./microservice-back     # chemin relatif depuis Projet_9
-      dockerfile: Dockerfile
-    container_name: back
+    build: ./microservice-back
+    container_name: microservice-back
+    restart: always
     depends_on:
       - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/patientdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/patientdb
+      SPRING_DATASOURCE_USERNAME: medilabo
+      SPRING_DATASOURCE_PASSWORD: medipass
     ports:
       - "8081:8081"
 
   gateway:
-    build:
-      context: ./microservice-gateway  # chemin relatif depuis Projet_9
-      dockerfile: Dockerfile
-    container_name: gateway
+    build: ./microservice-gateway
+    container_name: microservice-gateway
+    restart: always
     depends_on:
       - back
     ports:
       - "8080:8080"
 
   front:
-    build:
-      context: ./microservice-front    # chemin relatif depuis Projet_9
-      dockerfile: Dockerfile
-    container_name: front
+    build: ./microservice-front
+    container_name: microservice-front
+    restart: always
     depends_on:
       - gateway
     ports:
