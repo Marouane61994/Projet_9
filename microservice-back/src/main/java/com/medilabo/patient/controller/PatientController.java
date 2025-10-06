@@ -1,10 +1,12 @@
 package com.medilabo.patient.controller;
 
+import ch.qos.logback.core.model.Model;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.service.PatientService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/patients")
@@ -15,6 +17,7 @@ public class PatientController {
     public PatientController(PatientService service) {
         this.service = service;
     }
+
 
     @GetMapping
     public List<Patient> getAllPatients() {
@@ -36,4 +39,6 @@ public class PatientController {
     public void deletePatient(@PathVariable Long id) {
         service.deletePatient(id);
     }
+
+
 }

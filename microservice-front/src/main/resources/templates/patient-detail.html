@@ -2,17 +2,54 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Détails du Patient</title>
+    <title>Détails du patient</title>
 </head>
 <body>
-<h1>Détails du Patient</h1>
-<p><strong>Prénom :</strong> <span th:text="${patient.prenom}"></span></p>
-<p><strong>Nom :</strong> <span th:text="${patient.nom}"></span></p>
-<p><strong>Date de naissance :</strong> <span th:text="${patient.dateNaissance}"></span></p>
-<p><strong>Genre :</strong> <span th:text="${patient.genre}"></span></p>
-<p><strong>Adresse :</strong> <span th:text="${patient.adresse}"></span></p>
-<p><strong>Téléphone :</strong> <span th:text="${patient.telephone}"></span></p>
+<div class="container">
 
-<a href="/patients">Retour à la liste</a>
+    <h1>Détails du patient</h1>
+
+    <div class="info">
+        <p><strong>ID :</strong> <span th:text="${patient.id}"></span></p>
+        <p><strong>Nom :</strong> <span th:text="${patient.family}"></span></p>
+        <p><strong>Prénom :</strong> <span th:text="${patient.given}"></span></p>
+        <p><strong>Date de naissance :</strong> <span th:text="${patient.dob}"></span></p>
+        <p><strong>Genre :</strong> <span th:text="${patient.sex}"></span></p>
+        <p><strong>Adresse :</strong> <span th:text="${patient.address}"></span></p>
+        <p><strong>Téléphone :</strong> <span th:text="${patient.phone}"></span></p>
+    </div>
+
+    <hr/>
+
+    <div class="notes">
+        <h2>Notes du médecin</h2>
+
+        <div th:if="${notes.isEmpty()}">
+            <p>Aucune note enregistrée pour ce patient.</p>
+        </div>
+
+        <ul th:if="${!notes.isEmpty()}">
+            <li th:each="note : ${notes}">
+                <pre th:text="${note.note}"></pre>
+            </li>
+        </ul>
+
+        <hr/>
+
+        <h3>Ajouter une nouvelle note</h3>
+        <form th:action="@{/notes/add}" method="post" th:object="${newNote}">
+            <input type="hidden" th:field="*{patId}" th:value="${patient.id}" />
+            <input type="hidden" th:field="*{patient}" th:value="${patient.family}" />
+            <textarea th:field="*{note}" rows="5" placeholder="Saisir une nouvelle note ici..."></textarea>
+            <br/>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
+
+    <hr/>
+
+    <a th:href="@{/patients}">← Retour à la liste des patients</a>
+
+</div>
 </body>
 </html>
