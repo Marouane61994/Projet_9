@@ -1,6 +1,6 @@
 package com.medilabo.patient.controller;
 
-import ch.qos.logback.core.model.Model;
+
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.service.PatientService;
 import org.springframework.web.bind.annotation.*;

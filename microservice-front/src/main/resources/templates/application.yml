@@ -3,4 +3,11 @@ server:
 
 spring:
   application:
-    name: front-service
+    name: front
+  thymeleaf:
+    cache: false
+  main:
+    allow-bean-definition-overriding: true
+
+gateway:
+  url: http://gateway:8082

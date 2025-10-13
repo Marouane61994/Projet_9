@@ -1,17 +1,30 @@
 server:
-  port: 8080
+  port: 8083
 
 spring:
   application:
-    name: gateway-service
+    name: gateway
+
   cloud:
     gateway:
       routes:
+        # Route vers le service patient
         - id: patient-service
-          uri: http://back:8081
+          uri: http://patient-service:8085
           predicates:
-            - Path=/patients/**
-        - id: front-service
+            - Path=/patient-service/**
+          filters:
+            - StripPrefix=1
+
+
+        # Route vers le front (Thymeleaf)
+        - id: front
           uri: http://front:8082
           predicates:
-            - Path=/front/**
+            - Path=/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

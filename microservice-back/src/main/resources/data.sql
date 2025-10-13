@@ -1,4 +1,4 @@
-INSERT INTO patient (prenom, nom, date_naissance, genre, adresse, telephone)
+INSERT INTO patients (prenom, nom, date_naissance, genre, adresse, telephone)
 VALUES
 ('Test', 'TestNone', '1966-12-31', 'FEMME', '1 Brookside St', '100-222-3333'),
 ('Test', 'TestBorderline', '1945-06-24', 'HOMME', '2 High St', '200-333-4444'),

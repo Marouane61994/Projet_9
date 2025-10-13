@@ -31,5 +31,7 @@ public class Patient {
 
     private String adresse;
     private String telephone;
+
 }
+
 
