@@ -10,5 +10,5 @@ spring:
     allow-bean-definition-overriding: true
 
 gateway:
-  url: http://gateway:8080
+  url: http://gateway:8083
 

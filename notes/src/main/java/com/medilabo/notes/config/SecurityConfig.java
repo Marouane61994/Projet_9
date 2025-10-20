@@ -1,4 +1,4 @@
-package com.medilabo.notes.config;
+//package com.medilabo.notes.config;
 
-public class SecurityConfig {
-}
+//public class SecurityConfig {
+//}
