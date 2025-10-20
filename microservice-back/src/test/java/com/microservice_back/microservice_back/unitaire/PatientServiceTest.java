@@ -84,13 +84,6 @@ class PatientServiceTest {
         verify(patientRepository, times(1)).save(patient);
     }
 
-    @Test
-    void shouldDeletePatient() {
-        // Act
-        patientService.deletePatient(1L);
 
-        // Assert
-        verify(patientRepository, times(1)).deleteById(1L);
-    }
 }
 

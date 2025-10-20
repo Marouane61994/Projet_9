@@ -1,5 +1,6 @@
 package com.medilabo.front.Service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 
 
@@ -15,8 +16,9 @@ public class PatientService {
 
     private final RestClient restClient;
 
-    public PatientService(RestClient.Builder builder) {
-        this.restClient = builder.baseUrl("http://gateway:8080/patient-service").build();
+    public PatientService(RestClient.Builder builder,
+                          @Value("${gateway.url}") String gatewayUrl) {
+        this.restClient = builder.baseUrl(gatewayUrl + "/patient-service").build();
     }
 
     public List<Patient> getAllPatients() {
@@ -24,6 +26,7 @@ public class PatientService {
                 .uri("/patients")
                 .retrieve()
                 .body(Patient[].class);
+        assert patients != null;
         return Arrays.asList(patients);
     }
 
@@ -33,5 +36,14 @@ public class PatientService {
                 .retrieve()
                 .body(Patient.class);
     }
+
+    public void updatePatient(Long id, Patient patient) {
+        restClient.put()
+                .uri("/patients/{id}", id)
+                .body(patient)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
 }
 

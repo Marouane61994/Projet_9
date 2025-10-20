@@ -3,6 +3,7 @@ package com.microservice_back.microservice_back.integration;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medilabo.patient.model.Genre;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,23 +47,20 @@ class PatientControllerTest {
 
     @Test
     void shouldCreateAndRetrievePatient() throws Exception {
-        // Création d’un patient
         Patient patient = new Patient();
         patient.setNom("Dupont");
         patient.setPrenom("Jean");
         patient.setDateNaissance("1990-01-01");
-       // patient.setGenre(Patient.Genre.HOMME);
+        patient.setGenre(Genre.HOMME);
         patient.setAdresse("10 rue de Paris");
         patient.setTelephone("0102030405");
 
-        // Requête POST pour créer le patient
         mockMvc.perform(post("/patients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nom").value("Dupont"));
 
-        // Vérifier qu’il est bien récupérable
         mockMvc.perform(get("/patients"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nom").value("Dupont"));
@@ -73,7 +71,7 @@ class PatientControllerTest {
         patient.setPrenom("Jane");
         patient.setNom("Smith");
         patient.setDateNaissance("1985-05-05");
-       // patient.setGenre(Patient.Genre.FEMME);
+        patient.setGenre(Genre.FEMME);
         patient.setAdresse("5 rue Victor Hugo");
         patient.setTelephone("0611111111");
 

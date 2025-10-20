@@ -8,16 +8,14 @@ spring:
   cloud:
     gateway:
       routes:
-        # Route vers le service patient
         - id: patient-service
-          uri: http://patient-service:8085
+          uri: http://patient-service:8086
           predicates:
             - Path=/patient-service/**
           filters:
             - StripPrefix=1
 
 
-        # Route vers le front (Thymeleaf)
         - id: front
           uri: http://front:8082
           predicates:
