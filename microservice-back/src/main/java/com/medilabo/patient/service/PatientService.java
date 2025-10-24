@@ -5,7 +5,7 @@ import com.medilabo.patient.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class PatientService {
@@ -20,10 +20,10 @@ public class PatientService {
         return repository.findAll();
     }
 
-    public Optional<Patient> getPatientById(Long id) {
-        return repository.findById(id);
+    public Patient getPatientById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("❌ Patient non trouvé avec l'ID : " + id));
     }
-
     public Patient savePatient(Patient patient) {
         return repository.save(patient);
     }

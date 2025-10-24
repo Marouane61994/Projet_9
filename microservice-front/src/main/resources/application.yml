@@ -10,5 +10,6 @@ spring:
     allow-bean-definition-overriding: true
 
 gateway:
-  url: http://gateway:8083
+  url: http://localhost:8083
+
 

@@ -43,18 +43,7 @@ services:
     networks:
       - medilabo-net
 
-  notes-back:
-    build: ./microservice-notes
-    container_name: microservice-notes
-    restart: always
-    depends_on:
-      - mongodb
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notesdb
-    ports:
-      - "8087:8087"
-    networks:
-      - medilabo-net
+
 
   gateway:
     build: ./microservice-gateway
@@ -62,7 +51,6 @@ services:
     restart: always
     depends_on:
       - back
-      - notes-back
     ports:
       - "8083:8083"
     networks:

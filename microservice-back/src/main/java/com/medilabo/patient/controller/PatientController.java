@@ -26,8 +26,7 @@ public class PatientController {
 
     @GetMapping("/{id}")
     public Patient getPatientById(@PathVariable Long id) {
-        return service.getPatientById(id)
-                .orElseThrow(() -> new RuntimeException("Patient non trouvé : " + id));
+        return service.getPatientById(id);
     }
 
     @PostMapping
