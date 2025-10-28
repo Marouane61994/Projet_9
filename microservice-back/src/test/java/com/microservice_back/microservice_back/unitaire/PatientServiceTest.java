@@ -45,13 +45,10 @@ class PatientServiceTest {
 
     @Test
     void shouldReturnAllPatients() {
-        // Arrange
         when(patientRepository.findAll()).thenReturn(List.of(patient));
 
-        // Act
         List<Patient> result = patientService.getAllPatients();
 
-        // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getNom()).isEqualTo("Dupont");
         verify(patientRepository, times(1)).findAll();
@@ -59,27 +56,22 @@ class PatientServiceTest {
 
     @Test
     void shouldReturnPatientById() {
-        // Arrange
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
 
-        // Act
-        Optional<Patient> result = patientService.getPatientById(1L);
+        Patient result = patientService.getPatientById(1L); // ✅
 
-        // Assert
-        assertThat(result).isPresent();
-        assertThat(result.get().getPrenom()).isEqualTo("Jean");
+        assertThat(result).isNotNull();
+        assertThat(result.getPrenom()).isEqualTo("Jean");
         verify(patientRepository, times(1)).findById(1L);
     }
 
+
     @Test
     void shouldSavePatient() {
-        // Arrange
         when(patientRepository.save(any(Patient.class))).thenReturn(patient);
 
-        // Act
         Patient saved = patientService.savePatient(patient);
 
-        // Assert
         assertThat(saved.getNom()).isEqualTo("Dupont");
         verify(patientRepository, times(1)).save(patient);
     }

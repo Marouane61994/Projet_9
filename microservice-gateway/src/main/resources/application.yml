@@ -9,13 +9,19 @@ spring:
     gateway:
       routes:
         - id: patient-service
-          uri: http://localhost:8086
+          uri: http://localhost:8081
           predicates:
             - Path=/patient-service/**
           filters:
             - StripPrefix=1
 
 
+        - id: note-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/note-service/**
+          filters:
+            - StripPrefix=1
 
 
 management:

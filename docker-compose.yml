@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   db:
@@ -28,7 +27,40 @@ services:
       SPRING_DATASOURCE_USERNAME: medilabo
       SPRING_DATASOURCE_PASSWORD: medipass
     ports:
-      - "8086:8086"
+      - "8081:8081"
+    network_mode: "host"
+
+  front:
+    build: ./microservice-front
+    container_name: microservice-front
+    restart: always
+    depends_on:
+      - gateway
+    ports:
+      - "8082:8082"
+    network_mode: "host"
+
+  gateway:
+    build: ./microservice-gateway
+    container_name: microservice-gateway
+    restart: always
+    depends_on:
+      - back
+    ports:
+      - "8083:8083"
+    network_mode: "host"
+
+  notes:
+    build: ./microservice-notes
+    container_name: microservice-notes
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notesdb
+      SPRING_APPLICATION_NAME: note-services
+    ports:
+      - "8084:8084"
     networks:
       - medilabo-net
 
@@ -44,33 +76,10 @@ services:
       - medilabo-net
 
 
-
-  gateway:
-    build: ./microservice-gateway
-    container_name: microservice-gateway
-    restart: always
-    depends_on:
-      - back
-    ports:
-      - "8083:8083"
-    networks:
-      - medilabo-net
-
-
-  front:
-    build: ./microservice-front
-    container_name: microservice-front
-    restart: always
-    depends_on:
-      - gateway
-    ports:
-      - "8082:8082"
-    networks:
-      - medilabo-net
-
-networks:
-  medilabo-net:
-
 volumes:
   db_data:
   mongo_data:
+
+networks:
+  medilabo-net:
+    driver: bridge
