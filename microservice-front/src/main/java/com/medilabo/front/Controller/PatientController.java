@@ -5,6 +5,7 @@ import com.medilabo.front.model.Patient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -19,9 +20,13 @@ public class PatientController {
     }
 
     @GetMapping
-    public String listPatients(Model model) {
+    public String listPatients(Model model,
+                               @RequestParam(value = "success", required = false) String successMessage) {
         List<Patient> patients = patientService.getAllPatients();
         model.addAttribute("patients", patients);
+        if (successMessage != null) {
+            model.addAttribute("successMessage", successMessage);
+        }
         return "patients";
     }
 
@@ -40,10 +45,13 @@ public class PatientController {
     }
 
     @PostMapping("/{id}/edit")
-    public String updatePatient(@PathVariable Long id, @ModelAttribute Patient patient) {
+    public String updatePatient(@PathVariable Long id,
+                                @ModelAttribute Patient patient,
+                                RedirectAttributes redirectAttributes) {
         patient.setId(id);
         patientService.updatePatient(id, patient);
+
+        redirectAttributes.addAttribute("success", "Le patient a bien été modifié !");
         return "redirect:/patients";
     }
 }
-

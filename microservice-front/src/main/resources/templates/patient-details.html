@@ -3,10 +3,26 @@
 <head>
     <title>Détails du patient</title>
     <meta charset="UTF-8">
+    <script>
+        // Fonction pour supprimer une note via AJAX
+        function deleteNote(noteId) {
+            fetch('/api/notes/' + noteId, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.status === 204) {
+                    alert('Note supprimée');
+                    location.reload();
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 
 <h1>Détails du patient</h1>
+
 <p><strong>Nom :</strong> <span th:text="${patient.nom}"></span></p>
 <p><strong>Prénom :</strong> <span th:text="${patient.prenom}"></span></p>
 <p><strong>Date de naissance :</strong> <span th:text="${patient.dateNaissance}"></span></p>
@@ -14,8 +30,36 @@
 <p><strong>Adresse :</strong> <span th:text="${patient.adresse}"></span></p>
 <p><strong>Téléphone :</strong> <span th:text="${patient.telephone}"></span></p>
 
+<hr/>
 
+<h2>Notes du patient</h2>
+
+<div th:if="${notes.size() == 0}">
+    <p>Aucune note pour ce patient.</p>
+</div>
+
+<div th:each="note : ${notes}">
+    <p>
+        <strong th:text="${#dates.format(note.date, 'dd/MM/yyyy HH:mm')}"></strong> :
+        <span th:text="${note.note}"></span>
+        <button type="button" th:onclick="'deleteNote(' + '\'' + ${note.id} + '\'' + ')'">Supprimer</button>
+    </p>
+</div>
+
+<hr/>
+
+<h3>Ajouter une note</h3>
+<form th:action="@{/api/notes}" method="post">
+    <input type="hidden" name="patId" th:value="${patient.id}" />
+    <input type="hidden" name="patient" th:value="${patient.nom}" />
+    <textarea name="note" placeholder="Ajouter une note..." required></textarea>
+    <br/>
+    <button type="submit">Ajouter</button>
+</form>
+
+<br/>
 <a href="/patients">Retour à la liste</a>
 
 </body>
 </html>
+

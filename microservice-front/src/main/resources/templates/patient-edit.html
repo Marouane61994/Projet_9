@@ -2,11 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Modifier un Patient</title>
+    <meta charset="UTF-8">
+    <script>
+        // Supprimer une note via AJAX
+        function deleteNote(noteId) {
+            fetch('/api/notes/' + noteId, { method: 'DELETE' })
+            .then(response => {
+                if (response.status === 204) {
+                    alert('Note supprimée');
+                    location.reload();
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 <h2>Modifier le Patient</h2>
 
-<form th:action="@{'/patients/edit/' + ${patient.id}}" method="post" th:object="${patient}">
+<form th:action="@{'/patients/' + ${patient.id} + '/edit'}" method="post" th:object="${patient}">
     <label>Prénom :</label>
     <input type="text" th:field="*{prenom}" required /><br/>
 
@@ -31,7 +46,35 @@
     <button type="submit">Enregistrer</button>
 </form>
 
+<hr/>
+
+<h3>Notes du patient</h3>
+
+<div th:if="${notes.size() == 0}">
+    <p>Aucune note pour ce patient.</p>
+</div>
+
+<div th:each="note : ${notes}">
+    <p>
+        <strong th:text="${#dates.format(note.date, 'dd/MM/yyyy HH:mm')}"></strong> :
+        <span th:text="${note.note}"></span>
+        <button type="button" th:onclick="'deleteNote(' + '\'' + ${note.id} + '\'' + ')'">Supprimer</button>
+    </p>
+</div>
+
+<hr/>
+
+<h3>Ajouter une note</h3>
+<form th:action="@{/api/notes}" method="post">
+    <input type="hidden" name="patId" th:value="${patient.id}" />
+    <input type="hidden" name="patient" th:value="${patient.nom}" />
+    <textarea name="note" placeholder="Ajouter une note..." required></textarea>
+    <br/>
+    <button type="submit">Ajouter</button>
+</form>
+
 <br/>
-<a th:href="@{/patients}">Retour à la liste des patients</a>
+<a th:href="@{/patients}">← Retour à la liste des patients</a>
+
 </body>
 </html>

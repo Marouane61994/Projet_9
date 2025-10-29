@@ -7,6 +7,10 @@
 <body>
 <h1>Liste des patients</h1>
 
+<div th:if="${successMessage}" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+    <p th:text="${successMessage}"></p>
+</div>
+
 <table border="1">
     <thead>
     <tr>
@@ -16,6 +20,7 @@
         <th>Date de naissance</th>
         <th>Genre</th>
         <th>Détails</th>
+        <th>Modifier</th>
     </tr>
     </thead>
     <tbody>
@@ -26,6 +31,7 @@
         <td th:text="${patient.dateNaissance}"></td>
         <td th:text="${patient.genre}"></td>
         <td><a th:href="@{'/patients/' + ${patient.id}}">Voir</a></td>
+        <td><a th:href="@{'/patients/' + ${patient.id} + '/edit'}">Modifier</a></td>
     </tr>
     </tbody>
 </table>

@@ -1,12 +1,10 @@
 package com.medilabo.patient.controller;
 
-
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.service.PatientService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/patients")
@@ -17,7 +15,6 @@ public class PatientController {
     public PatientController(PatientService service) {
         this.service = service;
     }
-
 
     @GetMapping
     public List<Patient> getAllPatients() {
@@ -32,6 +29,11 @@ public class PatientController {
     @PostMapping
     public Patient createPatient(@RequestBody Patient patient) {
         return service.savePatient(patient);
+    }
+
+    @PutMapping("/{id}")
+    public Patient updatePatient(@PathVariable Long id, @RequestBody Patient updatedPatient) {
+        return service.updatePatient(id, updatedPatient);
     }
 
 }
