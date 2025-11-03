@@ -60,7 +60,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notesdb
       SPRING_APPLICATION_NAME: note-services
     ports:
-      - "8084:8084"
+      - "8085:8085"
     networks:
       - medilabo-net
 
@@ -72,6 +72,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+      - ./init-mongo:/docker-entrypoint-initdb.d:ro
     networks:
       - medilabo-net
 

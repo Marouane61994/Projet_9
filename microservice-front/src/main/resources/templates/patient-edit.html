@@ -50,9 +50,10 @@
 
 <h3>Notes du patient</h3>
 
-<div th:if="${notes.size() == 0}">
-    <p>Aucune note pour ce patient.</p>
+<div th:if="${notes == null or #lists.isEmpty(notes)}">
+    Aucune note trouvée
 </div>
+
 
 <div th:each="note : ${notes}">
     <p>

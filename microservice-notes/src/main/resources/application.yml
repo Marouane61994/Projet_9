@@ -1,0 +1,12 @@
+server:
+  port: 8085
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: notesdb
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
