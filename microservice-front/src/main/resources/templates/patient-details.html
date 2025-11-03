@@ -40,16 +40,21 @@
 
 <div th:each="note : ${notes}">
     <p>
-        <strong th:text="${#dates.format(note.date, 'dd/MM/yyyy HH:mm')}"></strong> :
         <span th:text="${note.note}"></span>
-        <button type="button" th:onclick="'deleteNote(' + '\'' + ${note.id} + '\'' + ')'">Supprimer</button>
+        <button
+                type="button"
+                data-id="${note.id}"
+                onclick="deleteNote(this.getAttribute('data-id'))">
+            Supprimer
+        </button>
     </p>
 </div>
+
 
 <hr/>
 
 <h3>Ajouter une note</h3>
-<form th:action="@{/api/notes}" method="post">
+<form th:action="@{/notes}" method="post">
     <input type="hidden" name="patId" th:value="${patient.id}" />
     <input type="hidden" name="patient" th:value="${patient.nom}" />
     <textarea name="note" placeholder="Ajouter une note..." required></textarea>

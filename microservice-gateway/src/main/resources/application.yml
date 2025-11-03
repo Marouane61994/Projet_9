@@ -16,7 +16,7 @@ spring:
             - StripPrefix=1
 
         - id: note-service
-          uri: http://localhost:8084
+          uri: http://localhost:8085
           predicates:
             - Path=/note-service/**
           filters:

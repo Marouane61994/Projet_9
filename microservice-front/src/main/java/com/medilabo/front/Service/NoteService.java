@@ -29,4 +29,12 @@ public class NoteService {
                         .body(Note[].class))
         );
     }
+    public void save(Note note) {
+        restClient.post()
+                .uri("/notes")  // endpoint du microservice pour créer une note
+                .body(note)
+                .retrieve()
+                .body(Note.class);
+    }
+
 }

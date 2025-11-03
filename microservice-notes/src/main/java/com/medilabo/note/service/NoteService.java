@@ -22,7 +22,7 @@ public class NoteService {
     }
 
     public List<Note> getNotesByPatient(Long patId) {
-        return repository.findByPatId(Math.toIntExact(patId));
+        return repository.findByPatId(patId);
     }
 
     public Note save(Note note) {
