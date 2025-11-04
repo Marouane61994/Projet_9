@@ -37,4 +37,13 @@ public class NoteService {
                 .body(Note.class);
     }
 
+    public void delete(String id) {
+        restClient.delete()
+                .uri("/notes/{id}", id)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+
+
 }

@@ -42,13 +42,27 @@
     <p>
         <span th:text="${note.note}"></span>
         <button
-                type="button"
-                data-id="${note.id}"
+                th:attr="data-id=${note.id}"
                 onclick="deleteNote(this.getAttribute('data-id'))">
             Supprimer
         </button>
     </p>
 </div>
+
+<script>
+    function deleteNote(id) {
+        fetch('/notes/' + id, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("Erreur lors de la suppression");
+                }
+            })
+            .catch(() => alert("Erreur lors de la suppression"));
+    }
+</script>
+
 
 
 <hr/>

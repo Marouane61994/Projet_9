@@ -23,13 +23,13 @@
 
 <form th:action="@{'/patients/' + ${patient.id} + '/edit'}" method="post" th:object="${patient}">
     <label>Prénom :</label>
-    <input type="text" th:field="*{prenom}" required /><br/>
+    <input type="text" th:field="*{prenom}" required/><br/>
 
     <label>Nom :</label>
-    <input type="text" th:field="*{nom}" required /><br/>
+    <input type="text" th:field="*{nom}" required/><br/>
 
     <label>Date de naissance :</label>
-    <input type="date" th:field="*{dateNaissance}" required /><br/>
+    <input type="date" th:field="*{dateNaissance}" required/><br/>
 
     <label>Genre :</label>
     <select th:field="*{genre}">
@@ -38,46 +38,16 @@
     </select><br/>
 
     <label>Adresse :</label>
-    <input type="text" th:field="*{adresse}" /><br/>
+    <input type="text" th:field="*{adresse}"/><br/>
 
     <label>Téléphone :</label>
-    <input type="text" th:field="*{telephone}" /><br/>
+    <input type="text" th:field="*{telephone}"/><br/>
 
     <button type="submit">Enregistrer</button>
 </form>
 
 <hr/>
 
-<h3>Notes du patient</h3>
-
-<div th:if="${notes == null or #lists.isEmpty(notes)}">
-    Aucune note trouvée
-</div>
-
-
-<div th:each="note : ${notes}">
-    <p>
-        <span th:text="${note.note}"></span>
-        <button
-                type="button"
-                data-id="${note.id}"
-                onclick="deleteNote(this.getAttribute('data-id'))">
-            Supprimer
-        </button>
-    </p>
-</div>
-
-
-<hr/>
-
-<h3>Ajouter une note</h3>
-<form th:action="@{/notes}" method="post">
-    <input type="hidden" name="patId" th:value="${patient.id}" />
-    <input type="hidden" name="patient" th:value="${patient.nom}" />
-    <textarea name="note" placeholder="Ajouter une note..." required></textarea>
-    <br/>
-    <button type="submit">Ajouter</button>
-</form>
 
 <br/>
 <a th:href="@{/patients}">← Retour à la liste des patients</a>

@@ -5,21 +5,19 @@ import com.medilabo.front.Service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @Data
 @Controller
 @RequestMapping("/notes")
 public class NoteController {
 
-
     private final NoteService noteService;
     private final PatientService patientService;
-
 
 
     /**
@@ -43,5 +41,12 @@ public class NoteController {
         noteService.save(note);
         return "redirect:/notes/patient/" + note.getPatId();
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public void deleteNote(@PathVariable String id) {
+        noteService.delete(id);
+    }
+
 
 }
