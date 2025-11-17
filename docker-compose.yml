@@ -76,6 +76,23 @@ services:
     networks:
       - medilabo-net
 
+  diabetes:
+    build:
+      context: ./microservice-diabetes
+      dockerfile: Dockerfile
+    container_name: diabetes
+    ports:
+      - "8084:8084"
+    environment:
+      - PATIENT_SERVICE_URL=http://microservice-back:8081
+      - NOTE_SERVICE_URL=http://microservice-notes:8085
+    depends_on:
+      - back
+      - notes
+    networks:
+      - medilabo-net
+
+
 
 volumes:
   db_data:

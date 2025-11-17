@@ -75,6 +75,9 @@
     <br/>
     <button type="submit">Ajouter</button>
 </form>
+<a th:href="@{'/patients/' + ${patient.id} + '/assess'}" class="btn btn-secondary">
+    Voir le rapport de diabète
+</a>
 
 <br/>
 <a href="/patients">Retour à la liste</a>

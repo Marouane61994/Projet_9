@@ -6,12 +6,12 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.6</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
-    <groupId>com.microservice-front</groupId>
-    <artifactId>microservice-front</artifactId>
+    <groupId>com.microservice-diabetes</groupId>
+    <artifactId>microservice-diabetes</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>microservice-front</name>
+    <name>microservice-diabetes</name>
     <description>Demo project for Spring Boot</description>
     <url/>
     <licenses>
@@ -58,6 +58,16 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.42</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
     </dependencies>
 

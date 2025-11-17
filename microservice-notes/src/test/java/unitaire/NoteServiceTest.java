@@ -10,11 +10,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+
 
 class NoteServiceTest {
 
@@ -30,8 +32,13 @@ class NoteServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        note1 = new Note();
+        note1.setPatId(Long.valueOf("1"));
+        note1.setPatient("Martin");
+        note1.setNote("Note 1");
 
-        note1 = new Note("1", 100L, "Note 1");
+
+
         note2 = new Note("2", 200L, "Note 2");
     }
 
