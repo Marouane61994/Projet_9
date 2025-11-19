@@ -80,7 +80,7 @@ services:
     build:
       context: ./microservice-diabetes
       dockerfile: Dockerfile
-    container_name: diabetes
+    container_name: microservice-diabetes
     ports:
       - "8084:8084"
     environment:

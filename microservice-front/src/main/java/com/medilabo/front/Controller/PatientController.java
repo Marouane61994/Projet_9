@@ -1,15 +1,18 @@
 package com.medilabo.front.Controller;
 
+import com.medilabo.front.Service.DiabetesService;
 import com.medilabo.front.Service.NoteService;
 import com.medilabo.front.Service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/patients")
@@ -17,6 +20,9 @@ public class PatientController {
 
     private final NoteService noteService;
     private final PatientService patientService;
+
+    @Autowired
+    private DiabetesService diabetesService;
 
     public PatientController(NoteService noteService, PatientService patientService) {
         this.noteService = noteService;
@@ -36,13 +42,31 @@ public class PatientController {
 
     @GetMapping("/{id}")
     public String getPatientDetails(@PathVariable Long id, Model model) {
+
         Patient patient = patientService.getPatientById(id);
         List<Note> notes = noteService.getNotesByPatient(id);
 
+        // Récupération du rapport
+        Map<String, Object> rapport = diabetesService.getDiabetesReport(id);
+
         model.addAttribute("patient", patient);
         model.addAttribute("notes", notes);
+
+        // Si rapport OK
+        if (rapport != null) {
+            model.addAttribute("age", rapport.get("age"));
+            model.addAttribute("triggerCount", rapport.get("nombreDeclencheurs"));
+            model.addAttribute("riskLevel", rapport.get("niveauRisque"));
+        } else {
+            // Sinon valeurs par défaut
+            model.addAttribute("age", "N/A");
+            model.addAttribute("triggerCount", "N/A");
+            model.addAttribute("riskLevel", "Indisponible");
+        }
+
         return "patient-details";
     }
+
 
 
     @GetMapping("/{id}/edit")

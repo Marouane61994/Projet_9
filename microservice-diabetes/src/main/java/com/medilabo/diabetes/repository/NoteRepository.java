@@ -1,12 +1,14 @@
 package com.medilabo.diabetes.repository;
 
 import com.medilabo.diabetes.model.Note;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@Repository
 public class NoteRepository {
 
     private final RestClient restClient;

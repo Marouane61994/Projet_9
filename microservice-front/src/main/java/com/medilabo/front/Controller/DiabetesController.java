@@ -1,32 +1,31 @@
 package com.medilabo.front.Controller;
 
-import org.springframework.beans.factory.annotation.Value;
+
+import com.medilabo.front.Service.DiabetesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestClient;
 
 import java.util.Map;
 
 @Controller
 public class DiabetesController {
 
-    private final RestClient restClient;
+    private final DiabetesService diabetesService;
 
-    public DiabetesController(RestClient.Builder builder,
-                              @Value("${gateway.url}") String gatewayUrl) {
-        this.restClient = builder
-                .baseUrl(gatewayUrl + "/diabetes-service")
-                .build();
+    public DiabetesController(DiabetesService diabetesService) {
+        this.diabetesService = diabetesService;
     }
 
     @GetMapping("/patients/{id}/assess")
     public String getDiabetesReport(@PathVariable Long id, Model model) {
-        Map report = restClient.get()
-                .uri("/assess/{id}", id)
-                .retrieve()
-                .body(Map.class);
+        Map<String, Object> report = diabetesService.getDiabetesReport(id);
+
+        if (report == null) {
+            model.addAttribute("error", "Impossible de récupérer le rapport de diabète pour ce patient.");
+            return "diabetes-report";
+        }
 
         model.addAttribute("report", report);
         return "diabetes-report";

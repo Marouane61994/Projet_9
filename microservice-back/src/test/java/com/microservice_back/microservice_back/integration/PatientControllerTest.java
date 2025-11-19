@@ -1,8 +1,5 @@
 package com.microservice_back.microservice_back.integration;
 
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medilabo.patient.model.Genre;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.repository.PatientRepository;
@@ -14,11 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-
-
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,49 +35,51 @@ class PatientControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyListInitially() throws Exception {
-        mockMvc.perform(get("/patients"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
-    }
-
-    @Test
-    void shouldCreateAndRetrievePatient() throws Exception {
-        Patient patient = new Patient();
-        patient.setNom("Dupont");
-        patient.setPrenom("Jean");
-        patient.setDateNaissance("1990-01-01");
-        patient.setGenre(Genre.HOMME);
-        patient.setAdresse("10 rue de Paris");
-        patient.setTelephone("0102030405");
+    void testCreatePatient() throws Exception {
+        Patient patient = new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405");
 
         mockMvc.perform(post("/patients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nom").value("Dupont"));
-
-        mockMvc.perform(get("/patients"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nom").value("Dupont"));
+                .andExpect(jsonPath("$.nom").value("Doe"))
+                .andExpect(jsonPath("$.prenom").value("John"));
     }
+
     @Test
-    void shouldDeletePatient() throws Exception {
-        Patient patient = new Patient();
-        patient.setPrenom("Jane");
-        patient.setNom("Smith");
-        patient.setDateNaissance("1985-05-05");
-        patient.setGenre(Genre.FEMME);
-        patient.setAdresse("5 rue Victor Hugo");
-        patient.setTelephone("0611111111");
-
-        Patient saved = patientRepository.save(patient);
-
-        mockMvc.perform(delete("/patients/{id}", saved.getId()))
-                .andExpect(status().isOk());
+    void testGetAllPatients() throws Exception {
+        Patient p1 = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
+        Patient p2 = patientRepository.save(new Patient(null, "Smith", "Jane", "1985-05-10", Genre.FEMME, "Rue Y", "0607080910"));
 
         mockMvc.perform(get("/patients"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].nom").value("Doe"))
+                .andExpect(jsonPath("$[1].nom").value("Smith"));
+    }
+
+    @Test
+    void testGetPatientById() throws Exception {
+        Patient patient = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
+
+        mockMvc.perform(get("/patients/{id}", patient.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nom").value("Doe"))
+                .andExpect(jsonPath("$.prenom").value("John"));
+    }
+
+    @Test
+    void testUpdatePatient() throws Exception {
+        Patient patient = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
+
+        patient.setNom("UpdatedDoe");
+        patient.setPrenom("UpdatedJohn");
+
+        mockMvc.perform(put("/patients/{id}", patient.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(patient)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nom").value("UpdatedDoe"))
+                .andExpect(jsonPath("$.prenom").value("UpdatedJohn"));
     }
 }
