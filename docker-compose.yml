@@ -28,7 +28,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: medipass
     ports:
       - "8081:8081"
-    network_mode: "host"
+    networks:
+      - medilabo-net
 
   front:
     build: ./microservice-front
@@ -38,7 +39,8 @@ services:
       - gateway
     ports:
       - "8082:8082"
-    network_mode: "host"
+    networks:
+      - medilabo-net
 
   gateway:
     build: ./microservice-gateway
@@ -48,7 +50,8 @@ services:
       - back
     ports:
       - "8083:8083"
-    network_mode: "host"
+    networks:
+      - medilabo-net
 
   notes:
     build: ./microservice-notes
@@ -72,7 +75,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-      - ./init-mongo:/docker-entrypoint-initdb.d:ro
+      - ./init-mongo:/docker-entrypoint-initdb.d
     networks:
       - medilabo-net
 

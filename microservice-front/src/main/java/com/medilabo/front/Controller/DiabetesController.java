@@ -28,6 +28,7 @@ public class DiabetesController {
         }
 
         model.addAttribute("report", report);
+        model.addAttribute("patientId", id);
         return "diabetes-report";
     }
 }

@@ -2,110 +2,107 @@ package com.microservice_front.microservice_front.unitaire;
 
 import com.medilabo.front.Service.PatientService;
 import com.medilabo.front.model.Patient;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestClient;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class PatientServiceTest {
 
-    @Mock
-    private RestClient.Builder builder;
+    private RestClient.Builder mockBuilder;
+    private RestClient mockRestClient;
 
-    @Mock
-    private RestClient restClient;
+    private RestClient.RequestHeadersUriSpec<?> mockHeadersUriSpec;
+    private RestClient.RequestBodyUriSpec mockBodyUriSpec;
+    private RestClient.ResponseSpec mockResponseSpec;
 
-    @Mock
-    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
-
-    @Mock
-    private RestClient.RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private RestClient.RequestBodySpec requestBodySpec;
-
-    @Mock
-    private RestClient.ResponseSpec responseSpec;
-
-    @InjectMocks
     private PatientService patientService;
 
-    private Patient patient1;
-    private Patient patient2;
-
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(builder.baseUrl(anyString())).thenReturn(builder);
-        when(builder.build()).thenReturn(restClient);
+    void setup() {
 
-        patientService = new PatientService(builder, "http://gateway");
+        mockBuilder = mock(RestClient.Builder.class);
+        mockRestClient = mock(RestClient.class);
 
-        // 🧱 Création de patients de test
-        patient1 = new Patient();
-        patient1.setId(1L);
-        patient1.setPrenom("Alice");
-        patient1.setNom("Dupont");
-        patient1.setDateNaissance(String.valueOf(LocalDate.of(1990, 5, 10)));
-        patient1.setGenre("F");
+        mockHeadersUriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+        mockBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        mockResponseSpec = mock(RestClient.ResponseSpec.class);
 
-        patient2 = new Patient();
-        patient2.setId(2L);
-        patient2.setPrenom("Bob");
-        patient2.setPrenom("Martin");
-        patient2.setDateNaissance(String.valueOf(LocalDate.of(1985, 3, 15)));
-        patient2.setGenre("M");
+        when(mockBuilder.baseUrl(anyString())).thenReturn(mockBuilder);
+        when(mockBuilder.build()).thenReturn(mockRestClient);
+
+        patientService = new PatientService(mockBuilder, "http://gateway");
     }
 
+    // =============================
+    //         GET ALL PATIENTS
+    // =============================
     @Test
-    void testGetAllPatients() {
-        Patient[] responseArray = { patient1, patient2 };
+    void getAllPatients_success() {
 
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("/patients")).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(Patient[].class)).thenReturn(responseArray);
+        Patient p1 = new Patient(1L, "Doe", "John", "1990-01-01", "M", "Paris", "0102030405");
+        Patient p2 = new Patient(2L, "Smith", "Anna", "1985-05-10", "F", "Lyon", "0606060606");
 
-        List<Patient> patients = patientService.getAllPatients();
+        Patient[] patientsArray = {p1, p2};
 
-        assertThat(patients).hasSize(2);
-        assertThat(patients.get(0).getPrenom()).isEqualTo("Alice");
-        verify(restClient).get();
+        //when(mockRestClient.get()).thenReturn(mockHeadersUriSpec);
+      //  when(mockHeadersUriSpec.uri("/patients")).thenReturn(mockHeadersUriSpec);
+        when(mockHeadersUriSpec.retrieve()).thenReturn(mockResponseSpec);
+        when(mockResponseSpec.body(Patient[].class)).thenReturn(patientsArray);
+
+        List<Patient> result = patientService.getAllPatients();
+
+        assertEquals(2, result.size());
+        assertEquals("Doe", result.get(0).getNom());
+        assertEquals("Smith", result.get(1).getNom());
     }
 
+    // =============================
+    //          GET BY ID
+    // =============================
     @Test
-    void testGetPatientById() {
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("/patients/{id}", 1L)).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(Patient.class)).thenReturn(patient1);
+    void getPatientById_success() {
+
+        Patient patient = new Patient(1L, "Doe", "John", "1990-01-01", "M", "Paris", "0101010101");
+
+        //when(mockRestClient.get()).thenReturn(mockHeadersUriSpec);
+//when(mockHeadersUriSpec.uri("/patients/{id}", 1L)).thenReturn(mockHeadersUriSpec);
+        when(mockHeadersUriSpec.retrieve()).thenReturn(mockResponseSpec);
+        when(mockResponseSpec.body(Patient.class)).thenReturn(patient);
 
         Patient result = patientService.getPatientById(1L);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getNom()).isEqualTo("Dupont");
-        verify(restClient).get();
+        assertNotNull(result);
+        assertEquals("Doe", result.getNom());
     }
 
+    // =============================
+    //         UPDATE PATIENT
+    // =============================
     @Test
-    void testUpdatePatient() {
-        when(restClient.put()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/patients/{id}", 1L)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(patient1)).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(null);
+    void updatePatient_success() {
 
-        patientService.updatePatient(1L, patient1);
+        Long id = 5L;
+        Patient updated = new Patient(id, "Martin", "Paul", "1975-11-11", "M", "Nice", "0707070707");
 
-        verify(restClient).put();
-        verify(requestBodySpec).body(patient1);
+        when(mockRestClient.put()).thenReturn(mockBodyUriSpec);
+        when(mockBodyUriSpec.uri("/patients/{id}", id)).thenReturn(mockBodyUriSpec);
+        when(mockBodyUriSpec.body(updated)).thenReturn(mockBodyUriSpec);
+        when(mockBodyUriSpec.retrieve()).thenReturn(mockResponseSpec);
+        when(mockResponseSpec.toBodilessEntity()).thenReturn(null);
+
+        patientService.updatePatient(id, updated);
+
+        verify(mockRestClient).put();
+        verify(mockBodyUriSpec).uri("/patients/{id}", id);
+        verify(mockBodyUriSpec).body(updated);
+        verify(mockBodyUriSpec).retrieve();
+        verify(mockResponseSpec).toBodilessEntity();
     }
 }

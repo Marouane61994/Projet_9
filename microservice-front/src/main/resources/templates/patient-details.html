@@ -58,7 +58,8 @@
         <p>
             <strong>Niveau de risque :</strong>
             <span th:text="${riskLevel}"
-                  th:classappend="'risk-' + ${riskLevel.toLowerCase()}"></span>
+                  th:classappend="${riskLevel != null} ? 'risk-' + ${riskLevel.toLowerCase()} : 'risk-indisponible'">
+        </span>
         </p>
     </div>
 

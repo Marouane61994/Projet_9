@@ -39,7 +39,7 @@ public class NoteController {
     @PostMapping
     public String addNote(@ModelAttribute Note note) {
         noteService.save(note);
-        return "redirect:/notes/patient/" + note.getPatId();
+        return "redirect:/patients/" + note.getPatId();
     }
 
     @DeleteMapping("/{id}")

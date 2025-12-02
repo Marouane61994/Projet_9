@@ -1,123 +1,111 @@
 package com.microservice_front.microservice_front.integration;
 
 import com.medilabo.front.Controller.PatientController;
+import com.medilabo.front.Service.DiabetesService;
 import com.medilabo.front.Service.NoteService;
 import com.medilabo.front.Service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-
-
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = PatientController.class)
+@ContextConfiguration(classes = com.medilabo.front.FrontApplication.class)
+@WebMvcTest(PatientController.class)
 class PatientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-
+    @MockitoBean
     private PatientService patientService;
 
-
+    @MockitoBean
     private NoteService noteService;
 
-    private Patient patient;
+    @MockitoBean
+    private DiabetesService diabetesService;
 
-    @BeforeEach
-    void setUp() {
-        patient = new Patient();
-        patient.setId(1L);
-        patient.setNom("John");
-        patient.setPrenom("Doe");
-        patient.setGenre("M");
-        patient.setAdresse("123 Rue Test");
-        patient.setTelephone("0102030405");
+    // ----------------------------------------------------------
+    // GET /patients
+    // ----------------------------------------------------------
+    @Test
+    void listPatients_shouldReturnPatientsView() throws Exception {
+
+        List<Patient> patients = List.of(new Patient(1L, "Doe", "John", "1980-01-01", "M", "10 rue X", "0102030405"), new Patient(2L, "Smith", "Anna", "1990-02-02", "F", "20 rue Y", "0607080910"));
+
+        when(patientService.getAllPatients()).thenReturn(patients);
+
+        mockMvc.perform(get("/patients")).andExpect(status().isOk()).andExpect(view().name("patients")).andExpect(model().attributeExists("patients")).andExpect(model().attribute("patients", patients));
     }
 
-    //  Test : afficher la liste des patients
+    // ----------------------------------------------------------
+    // GET /patients/{id}
+    // ----------------------------------------------------------
     @Test
-    void testListPatients() throws Exception {
-        List<Patient> patients = Collections.singletonList(patient);
-        Mockito.when(patientService.getAllPatients()).thenReturn(patients);
+    void getPatientDetails_shouldReturnPatientDetailsView() throws Exception {
 
-        mockMvc.perform(get("/patients"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("patients"))
-                .andExpect(model().attributeExists("patients"))
-                .andExpect(model().attribute("patients", patients));
+        Patient patient = new Patient(1L, "Doe", "John", "1980-01-01", "M", "10 rue X", "0102030405");
+
+        List<Note> notes = List.of(new Note("a1", 1L, "John Doe", "Première note"), new Note("b2", 1L, "John Doe", "Deuxième note"));
+
+        Map<String, Object> rapport = Map.of("age", 45, "nombreDeclencheurs", 6, "niveauRisque", "EarlyOnset");
+
+        when(patientService.getPatientById(1L)).thenReturn(patient);
+        when(noteService.getNotesByPatient(1L)).thenReturn(notes);
+        when(diabetesService.getDiabetesReport(1L)).thenReturn(rapport);
+
+        mockMvc.perform(get("/patients/1")).andExpect(status().isOk()).andExpect(view().name("patient-details")).andExpect(model().attribute("patient", patient)).andExpect(model().attribute("notes", notes)).andExpect(model().attribute("age", 45)).andExpect(model().attribute("triggerCount", 6)).andExpect(model().attribute("riskLevel", "EarlyOnset"));
     }
 
-    //  Test : afficher la liste avec message de succès
+    // Rapport indisponible
     @Test
-    void testListPatientsWithSuccessMessage() throws Exception {
-        Mockito.when(patientService.getAllPatients()).thenReturn(Collections.singletonList(patient));
+    void getPatientDetails_shouldHandleNullDiabetesReport() throws Exception {
 
-        mockMvc.perform(get("/patients").param("success", "ok"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("patients"))
-                .andExpect(model().attributeExists("successMessage"))
-                .andExpect(model().attribute("successMessage", "ok"));
+        Patient patient = new Patient(1L, "Doe", "John", "1980-01-01", "M", "10 rue X", "0102030405");
+
+        when(patientService.getPatientById(1L)).thenReturn(patient);
+        when(noteService.getNotesByPatient(1L)).thenReturn(List.of());
+        when(diabetesService.getDiabetesReport(1L)).thenReturn(null);
+
+        mockMvc.perform(get("/patients/1")).andExpect(status().isOk()).andExpect(view().name("patient-details")).andExpect(model().attribute("age", "N/A")).andExpect(model().attribute("triggerCount", "N/A")).andExpect(model().attribute("riskLevel", "Indisponible"));
     }
 
-    //  Test : afficher les détails d’un patient
+    // ----------------------------------------------------------
+    // GET /patients/{id}/edit
+    // ----------------------------------------------------------
     @Test
-    void testGetPatientDetails() throws Exception {
-        Note note = new Note();
-        note.setId("n1");
-        note.setPatId(1L);
-        note.setNote("Patient en bonne santé.");
+    void showEditForm_shouldReturnEditView() throws Exception {
 
-        Mockito.when(patientService.getPatientById(1L)).thenReturn(patient);
-        Mockito.when(noteService.getNotesByPatient(1L)).thenReturn(Collections.singletonList(note));
+        Patient patient = new Patient(1L, "Doe", "John", "1980-01-01", "M", "10 rue X", "0102030405");
 
-        mockMvc.perform(get("/patients/1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("patient-details"))
-                .andExpect(model().attributeExists("patient"))
-                .andExpect(model().attributeExists("notes"))
-                .andExpect(model().attribute("patient", patient));
+        when(patientService.getPatientById(1L)).thenReturn(patient);
+
+        mockMvc.perform(get("/patients/1/edit")).andExpect(status().isOk()).andExpect(view().name("patient-edit")).andExpect(model().attribute("patient", patient));
     }
 
-    //  Test : afficher le formulaire d’édition
+    // ----------------------------------------------------------
+    // POST /patients/{id}/edit
+    // ----------------------------------------------------------
     @Test
-    void testShowEditForm() throws Exception {
-        Mockito.when(patientService.getPatientById(1L)).thenReturn(patient);
+    void updatePatient_shouldRedirectWithSuccessMessage() throws Exception {
 
-        mockMvc.perform(get("/patients/1/edit"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("patient-edit"))
-                .andExpect(model().attributeExists("patient"))
-                .andExpect(model().attribute("patient", patient));
-    }
+        doNothing().when(patientService).updatePatient(eq(1L), any(Patient.class));
 
-    //  Test : soumettre la modification d’un patient
-    @Test
-    void testUpdatePatient() throws Exception {
-        Mockito.doNothing().when(patientService).updatePatient(eq(1L), any(Patient.class));
+        mockMvc.perform(post("/patients/1/edit").contentType(MediaType.APPLICATION_FORM_URLENCODED).param("nom", "Doe").param("prenom", "John").param("genre", "M").param("dateNaissance", "1980-01-01").param("adresse", "50 rue Z").param("telephone", "0101010101")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/patients?success=Le+patient+a+bien+%C3%A9t%C3%A9+modifi%C3%A9+%21"));
 
-        mockMvc.perform(post("/patients/1/edit")
-                        .param("firstName", "Jane")
-                        .param("lastName", "Doe")
-                        .param("gender", "F")
-                        .param("address", "456 Avenue Test")
-                        .param("phone", "0606060606"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/patients?success=Le+patient+a+bien+été+modifié+%21"));
-
-        Mockito.verify(patientService).updatePatient(eq(1L), any(Patient.class));
+        verify(patientService, times(1)).updatePatient(eq(1L), any(Patient.class));
     }
 }

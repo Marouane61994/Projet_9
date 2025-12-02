@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,8 +18,13 @@ public class NoteService {
 
     public NoteService(RestClient.Builder builder,
                        @Value("${gateway.url}") String gatewayUrl) {
+
+        String basicAuth = Base64.getEncoder()
+                .encodeToString("user:password".getBytes(StandardCharsets.UTF_8));
+
         this.restClient = builder
                 .baseUrl(gatewayUrl + "/note-service")
+                .defaultHeader("Authorization", "Basic " + basicAuth)
                 .build();
     }
 

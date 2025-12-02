@@ -1,22 +1,22 @@
 package com.microservice_back.microservice_back.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medilabo.patient.PatientApplication;
 import com.medilabo.patient.model.Genre;
 import com.medilabo.patient.model.Patient;
 import com.medilabo.patient.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-@SpringBootTest
+@SpringBootTest(classes = PatientApplication.class)
 @AutoConfigureMockMvc
 class PatientControllerTest {
 
@@ -24,62 +24,88 @@ class PatientControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private PatientRepository patientRepository;
+    private PatientRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Patient savedPatient;
+
     @BeforeEach
     void setup() {
-        patientRepository.deleteAll();
+        repository.deleteAll();
+
+        savedPatient = repository.save(new Patient(
+                null,
+                "Doe",              // nom
+                "John",             // prenom
+                "1980-01-01",       // dateNaissance (String)
+                Genre.HOMME,        // enum Genre
+                "10 Main Street",
+                "3000000000"
+        ));
     }
 
     @Test
-    void testCreatePatient() throws Exception {
-        Patient patient = new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405");
+    @DisplayName("GET /patients doit retourner la liste des patients")
+    void getAllPatients_shouldReturnList() throws Exception {
+        mockMvc.perform(get("/patients"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nom").value("Doe"))
+                .andExpect(jsonPath("$[0].prenom").value("John"));
+    }
+
+    @Test
+    @DisplayName("GET /patients/{id} doit retourner un patient")
+    void getPatientById_shouldReturnPatient() throws Exception {
+        mockMvc.perform(get("/patients/" + savedPatient.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nom").value("Doe"))
+                .andExpect(jsonPath("$.prenom").value("John"));
+    }
+
+    @Test
+    @DisplayName("POST /patients doit créer un patient")
+    void createPatient_shouldCreateNewPatient() throws Exception {
+
+        Patient newPatient = new Patient(
+                null,
+                "Smith",
+                "Alice",
+                "1990-05-15",
+                Genre.FEMME,
+                "5 Sunset Blvd",
+                "4000000000"
+        );
 
         mockMvc.perform(post("/patients")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patient)))
+                        .content(objectMapper.writeValueAsString(newPatient)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nom").value("Doe"))
-                .andExpect(jsonPath("$.prenom").value("John"));
+                .andExpect(jsonPath("$.nom").value("Smith"))
+                .andExpect(jsonPath("$.prenom").value("Alice"));
     }
 
     @Test
-    void testGetAllPatients() throws Exception {
-        Patient p1 = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
-        Patient p2 = patientRepository.save(new Patient(null, "Smith", "Jane", "1985-05-10", Genre.FEMME, "Rue Y", "0607080910"));
+    @DisplayName("PUT /patients/{id} doit mettre à jour un patient")
+    void updatePatient_shouldUpdateExistingPatient() throws Exception {
 
-        mockMvc.perform(get("/patients"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].nom").value("Doe"))
-                .andExpect(jsonPath("$[1].nom").value("Smith"));
-    }
+        Patient update = new Patient(
+                null,
+                "Updated",
+                "Johnny",
+                "1980-01-01",
+                Genre.HOMME,
+                "New Street",
+                "3100000000"
+        );
 
-    @Test
-    void testGetPatientById() throws Exception {
-        Patient patient = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
-
-        mockMvc.perform(get("/patients/{id}", patient.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nom").value("Doe"))
-                .andExpect(jsonPath("$.prenom").value("John"));
-    }
-
-    @Test
-    void testUpdatePatient() throws Exception {
-        Patient patient = patientRepository.save(new Patient(null, "Doe", "John", "1990-01-01", Genre.HOMME, "Rue X", "0102030405"));
-
-        patient.setNom("UpdatedDoe");
-        patient.setPrenom("UpdatedJohn");
-
-        mockMvc.perform(put("/patients/{id}", patient.getId())
+        mockMvc.perform(put("/patients/" + savedPatient.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patient)))
+                        .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nom").value("UpdatedDoe"))
-                .andExpect(jsonPath("$.prenom").value("UpdatedJohn"));
+                .andExpect(jsonPath("$.nom").value("Updated"))
+                .andExpect(jsonPath("$.prenom").value("Johnny"));
     }
+
 }

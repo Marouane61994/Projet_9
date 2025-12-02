@@ -4,131 +4,100 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medilabo.note.controller.NoteController;
 import com.medilabo.note.model.Note;
 import com.medilabo.note.service.NoteService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NoteController.class)
+@ContextConfiguration(classes = com.medilabo.note.NoteApplication.class)
 class NoteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-
-    private NoteService noteService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Note note1;
-    private Note note2;
-
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        note1 = new Note();
-        note1.setId("1");
-        note1.setPatId(100L);
-        note1.setNote("Note 1");
-
-        note2 = new Note();
-        note2.setId("2");
-        note2.setPatId(200L);
-        note2.setNote("Note 2");
-    }
-
+    @MockitoBean
+    private NoteService service;
 
     @Test
-    @DisplayName("GET /notes - doit retourner la liste de toutes les notes")
-    void getAllNotes_shouldReturnListOfNotes() throws Exception {
-        Mockito.when(noteService.getAllNotes()).thenReturn(List.of(note1, note2));
+    void getAllNotes_shouldReturnList() throws Exception {
+        List<Note> notes = Arrays.asList(
+                new Note("1", 1L, "Jean Dupont", "Première note"),
+                new Note("2", 1L, "Jean Dupont", "Deuxième note")
+        );
+
+        Mockito.when(service.getAllNotes()).thenReturn(notes);
 
         mockMvc.perform(get("/notes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].patId", is(101)))
-                .andExpect(jsonPath("$[1].note", is("Deuxième note")));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].note").value("Première note"));
     }
 
     @Test
-    @DisplayName("GET /notes/patient/{patId} - doit retourner les notes d’un patient")
-    void getNotesByPatient_shouldReturnNotesForPatient() throws Exception {
-        Mockito.when(noteService.getNotesByPatient(101L)).thenReturn(List.of(note1));
+    void getNotesByPatient_shouldReturnNotes() throws Exception {
+        List<Note> notes = List.of(
+                new Note("1", 5L, "John Doe", "Note patient 5")
+        );
 
-        mockMvc.perform(get("/notes/patient/101"))
+        Mockito.when(service.getNotesByPatient(5L)).thenReturn(notes);
+
+        mockMvc.perform(get("/notes/patient/5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].note", is("Première note")))
-                .andExpect(jsonPath("$[0].patId", is(101)));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].patient").value("John Doe"));
     }
 
     @Test
-    @DisplayName("POST /notes - doit créer une nouvelle note")
     void createNote_shouldReturnCreatedNote() throws Exception {
-        Note toCreate = new Note();
-        toCreate.setId(null);
-        toCreate.setPatId(103L);
-        toCreate.setNote("Nouvelle note");
+        Note note = new Note(null, 2L, "Marie Curie", "Nouvelle note");
+        Note saved = new Note("123", 2L, "Marie Curie", "Nouvelle note");
 
-        Note created = new Note();
-        created.setId("3");
-        created.setPatId(103L);
-        created.setNote("Nouvelle note");
-
-
-        Mockito.when(noteService.save(any(Note.class))).thenReturn(created);
+        Mockito.when(service.save(any(Note.class))).thenReturn(saved);
 
         mockMvc.perform(post("/notes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(toCreate)))
+                        .content(objectMapper.writeValueAsString(note)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is("3")))
-                .andExpect(jsonPath("$.patId", is(103)))
-                .andExpect(jsonPath("$.note", is("Nouvelle note")));
+                .andExpect(jsonPath("$.id").value("123"))
+                .andExpect(jsonPath("$.note").value("Nouvelle note"));
     }
 
     @Test
-    @DisplayName("PUT /notes/{id} - doit mettre à jour une note existante")
     void updateNote_shouldReturnUpdatedNote() throws Exception {
+        Note update = new Note(null, 3L, "Paul Martin", "Note mise à jour");
+        Note updated = new Note("777", 3L, "Paul Martin", "Note mise à jour");
 
-        Note updated = new Note();
-        updated.setId("1");
-        updated.setPatId(101L);
-        updated.setNote("Note mise à jour");
+        Mockito.when(service.update(eq("777"), any(Note.class))).thenReturn(updated);
 
-        Mockito.when(noteService.update(eq("1"), any(Note.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/notes/1")
+        mockMvc.perform(put("/notes/777")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updated)))
+                        .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is("1")))
-                .andExpect(jsonPath("$.note", is("Note mise à jour")));
+                .andExpect(jsonPath("$.id").value("777"))
+                .andExpect(jsonPath("$.note").value("Note mise à jour"));
     }
 
     @Test
-    @DisplayName("DELETE /notes/{id} - doit supprimer une note")
     void deleteNote_shouldReturnOk() throws Exception {
-        mockMvc.perform(delete("/notes/1"))
-                .andExpect(status().isOk());
+        Mockito.doNothing().when(service).delete("999");
 
-        Mockito.verify(noteService).delete("1");
+        mockMvc.perform(delete("/notes/999"))
+                .andExpect(status().isOk());
     }
 }

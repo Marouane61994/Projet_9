@@ -8,7 +8,9 @@ import com.medilabo.front.model.Patient;
 import org.springframework.stereotype.Service;
 
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -18,8 +20,15 @@ public class PatientService {
 
     public PatientService(RestClient.Builder builder,
                           @Value("${gateway.url}") String gatewayUrl) {
-        this.restClient = builder.baseUrl(gatewayUrl + "/patient-service").build();
+        String basicAuth = Base64.getEncoder()
+                .encodeToString("user:password".getBytes(StandardCharsets.UTF_8));
+
+        this.restClient = builder
+                .baseUrl(gatewayUrl + "/patient-service")
+                .defaultHeader("Authorization", "Basic " + basicAuth)
+                .build();
     }
+
 
     public List<Patient> getAllPatients() {
         Patient[] patients = restClient.get()

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div style="width: 320px; margin: auto; margin-top: 80px; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h2 style="text-align: center;">Connexion</h2>
+
+    <form th:action="@{/login}" method="post">
+
+        <div>
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" required autofocus>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <button type="submit">Se connecter</button>
+        </div>
+
+        <div th:if="${param.error}" style="color:red; margin-top:10px;">
+            Identifiants incorrects.
+        </div>
+
+        <div th:if="${param.logout}" style="color:green; margin-top:10px;">
+            Vous êtes déconnecté.
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

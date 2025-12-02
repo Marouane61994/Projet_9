@@ -1,7 +1,11 @@
 package com.medilabo.front.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Patient {
     private Long id;
