@@ -1,4 +1,3 @@
-
 services:
   db:
     image: mysql:8.0
@@ -16,57 +15,6 @@ services:
     networks:
       - medilabo-net
 
-  back:
-    build: ./microservice-back
-    container_name: microservice-back
-    restart: always
-    depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/patientdb
-      SPRING_DATASOURCE_USERNAME: medilabo
-      SPRING_DATASOURCE_PASSWORD: medipass
-    ports:
-      - "8081:8081"
-    networks:
-      - medilabo-net
-
-  front:
-    build: ./microservice-front
-    container_name: microservice-front
-    restart: always
-    depends_on:
-      - gateway
-    ports:
-      - "8082:8082"
-    networks:
-      - medilabo-net
-
-  gateway:
-    build: ./microservice-gateway
-    container_name: microservice-gateway
-    restart: always
-    depends_on:
-      - back
-    ports:
-      - "8083:8083"
-    networks:
-      - medilabo-net
-
-  notes:
-    build: ./microservice-notes
-    container_name: microservice-notes
-    restart: always
-    depends_on:
-      - mongodb
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notesdb
-      SPRING_APPLICATION_NAME: note-services
-    ports:
-      - "8085:8085"
-    networks:
-      - medilabo-net
-
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -79,6 +27,37 @@ services:
     networks:
       - medilabo-net
 
+  back:
+    build: ./microservice-back
+    container_name: microservice-back
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/patientdb
+      SPRING_DATASOURCE_USERNAME: medilabo
+      SPRING_DATASOURCE_PASSWORD: medipass
+      SERVER_PORT: 8081 # Ajout pour clarifier
+    ports:
+      - "8081:8081"
+    networks:
+      - medilabo-net
+
+  notes:
+    build: ./microservice-notes
+    container_name: microservice-notes
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notesdb
+      SPRING_APPLICATION_NAME: note-services
+      SERVER_PORT: 8085
+    ports:
+      - "8085:8085"
+    networks:
+      - medilabo-net
+
   diabetes:
     build:
       context: ./microservice-diabetes
@@ -87,14 +66,40 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - PATIENT_SERVICE_URL=http://microservice-back:8081
-      - NOTE_SERVICE_URL=http://microservice-notes:8085
+       - PATIENT_SERVICE_URL=http://microservice-back:8081
+       - NOTE_SERVICE_URL=http://microservice-notes:8085
     depends_on:
       - back
       - notes
     networks:
       - medilabo-net
 
+  gateway:
+    build: ./microservice-gateway
+    container_name: microservice-gateway
+    restart: always
+    depends_on:
+      - back
+      - notes
+      - diabetes
+    ports:
+      - "8083:8083"
+    networks:
+      - medilabo-net
+
+  front:
+    build: ./microservice-front
+    container_name: microservice-front
+    restart: always
+    depends_on:
+      - gateway
+    environment:
+      GATEWAY_URL: http://gateway:8083
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    networks:
+      - medilabo-net
 
 
 volumes:

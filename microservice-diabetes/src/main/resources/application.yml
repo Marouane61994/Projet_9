@@ -4,5 +4,6 @@ server:
 spring:
   application:
     name: microservice-diabetes
+
 gateway:
   url: http://localhost:8083

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "patients")
 @Data
@@ -23,7 +25,7 @@ public class Patient {
     private String prenom;
 
     @Column(nullable = false)
-    private String dateNaissance;
+    private LocalDate dateNaissance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

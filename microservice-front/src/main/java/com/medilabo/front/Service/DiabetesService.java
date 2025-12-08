@@ -9,6 +9,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 @Service
@@ -25,15 +27,31 @@ public class DiabetesService {
 
 
     public Map getDiabetesReport(Long patientId) {
-        LOGGER.info("Recupération du rapport de diabetes");
+        LOGGER.info("Récupération du rapport de diabète");
         String url = baseUrl + "/assess/" + patientId;
-        HttpHeaders headers =new HttpHeaders() ;
-        headers.set("Authorization","Basic TODO");
+
+        String username = "user";
+        String password = "password";
+
+        String auth = username + ":" + password;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        String authHeader = "Basic " + encodedAuth;
+
+        HttpHeaders headers = new HttpHeaders();
+       headers.set("Authorization", authHeader);
+
         try {
-            return (Map) restTemplate.<Map>exchange(url, HttpMethod.GET,new HttpEntity<>(headers), Map.class);
+            return restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            ).getBody();
         } catch (Exception e) {
-            LOGGER.error("Erreur pendant la récuperation du rapport ",e);
+            LOGGER.error("Erreur pendant la récupération du rapport", e);
             return null;
         }
     }
+
 }
+

@@ -1,4 +1,4 @@
-package com.medilabo.diabetes.configuration;
+package com.medilabo.front.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +11,14 @@ import java.util.Base64;
 @Configuration
 public class RestClientConfig {
 
+
     @Bean
     public RestClient restClient(RestClient.Builder builder,
                                  @Value("${gateway.url}") String gatewayUrl) {
 
         String username = "user";
         String password = "password";
+
 
         String auth = username + ":" + password;
         String basicAuth = Base64.getEncoder()

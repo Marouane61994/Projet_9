@@ -54,5 +54,12 @@ public class PatientService {
                 .toBodilessEntity();
     }
 
+    public Patient createPatient(Patient patient) {
+        return restClient.post()
+                .uri("/patients")
+                .body(patient)
+                .retrieve()
+                .body(Patient.class);
+    }
 }
 
