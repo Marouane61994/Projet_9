@@ -33,7 +33,7 @@ public class NoteService {
 
     public void save(Note note) {
         restClient.post()
-                .uri("/notes")  // endpoint du microservice pour créer une note
+                .uri("/notes")
                 .body(note)
                 .retrieve()
                 .body(Note.class);

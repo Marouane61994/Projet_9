@@ -29,7 +29,8 @@ spring:
           filters:
             - StripPrefix=1
 
-
+internal:
+  base-url: http://localhost
 
 
 management:

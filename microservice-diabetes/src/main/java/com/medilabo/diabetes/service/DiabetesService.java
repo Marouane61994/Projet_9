@@ -45,7 +45,7 @@ public class DiabetesService {
         String[] triggers = {
                 "hémoglobine a1c", "microalbumine", "taille", "poids",
                 "fumeur", "fumeuse", "anormal", "cholestérol",
-                "vertiges", "rechute", "réaction", "anticorps"
+                "vertige", "rechute", "réaction", "anticorps"
         };
 
         int count = 0;
@@ -75,20 +75,33 @@ public class DiabetesService {
     public String determineRiskLevel(String sex, int age, int triggerCount) {
         if (triggerCount == 0) return "None";
 
+        // --- Rendre la valeur 'sex' robuste ---
+        // Extrait la première lettre en majuscule pour gérer "HOMME", "FEMME", "M", ou "F".
+        String firstLetterSex = "";
+        if (sex != null && !sex.isEmpty()) {
+            firstLetterSex = sex.toUpperCase(Locale.ROOT).substring(0, 1);
+        }
+        // ------------------------------------
+
         if (age > 30) {
+            // Règles pour les patients de plus de 30 ans
             if (triggerCount >= 8) return "Early onset";
             if (triggerCount >= 6) return "In Danger";
             if (triggerCount >= 2) return "Borderline";
         } else {
-            if ("M".equalsIgnoreCase(sex)) {
+            // Règles pour les patients de 30 ans ou moins
+            if ("H".equals(firstLetterSex) || "M".equals(firstLetterSex)) {
+                // Homme (< 30 ans)
                 if (triggerCount >= 5) return "Early onset";
                 if (triggerCount >= 3) return "In Danger";
-            } else if ("F".equalsIgnoreCase(sex)) {
+            } else if ("F".equals(firstLetterSex)) {
+                // Femme (< 30 ans)
                 if (triggerCount >= 7) return "Early onset";
                 if (triggerCount >= 4) return "In Danger";
             }
         }
 
+        // Retour par défaut (pour les cas avec 1 déclencheur et < 30 ans, ou sexe non reconnu)
         return "None";
     }
 }

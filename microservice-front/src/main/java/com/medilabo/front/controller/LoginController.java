@@ -1,4 +1,4 @@
-package com.medilabo.front.Controller;
+package com.medilabo.front.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

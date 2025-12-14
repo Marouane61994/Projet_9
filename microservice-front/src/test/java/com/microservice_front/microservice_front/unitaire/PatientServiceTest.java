@@ -1,6 +1,6 @@
 package com.microservice_front.microservice_front.unitaire;
 
-import com.medilabo.front.Service.PatientService;
+import com.medilabo.front.service.PatientService;
 import com.medilabo.front.model.Patient;
 
 import org.junit.jupiter.api.BeforeEach;

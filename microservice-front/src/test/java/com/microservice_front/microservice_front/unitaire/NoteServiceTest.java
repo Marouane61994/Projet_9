@@ -1,6 +1,6 @@
 package com.microservice_front.microservice_front.unitaire;
 
-import com.medilabo.front.Service.NoteService;
+import com.medilabo.front.service.NoteService;
 import com.medilabo.front.model.Note;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

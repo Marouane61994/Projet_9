@@ -1,4 +1,4 @@
-package com.medilabo.front.Service;
+package com.medilabo.front.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
@@ -20,8 +20,10 @@ public class PatientService {
 
     public PatientService(RestClient.Builder builder,
                           @Value("${gateway.url}") String gatewayUrl) {
+
+        String authString = "technical_user_gateway:password";
         String basicAuth = Base64.getEncoder()
-                .encodeToString("user:password".getBytes(StandardCharsets.UTF_8));
+                .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
 
         this.restClient = builder
                 .baseUrl(gatewayUrl + "/patient-service")
@@ -54,12 +56,5 @@ public class PatientService {
                 .toBodilessEntity();
     }
 
-    public Patient createPatient(Patient patient) {
-        return restClient.post()
-                .uri("/patients")
-                .body(patient)
-                .retrieve()
-                .body(Patient.class);
-    }
 }
 

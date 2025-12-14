@@ -1,7 +1,7 @@
-package com.medilabo.front.Controller;
+package com.medilabo.front.controller;
 
-import com.medilabo.front.Service.NoteService;
-import com.medilabo.front.Service.PatientService;
+import com.medilabo.front.service.NoteService;
+import com.medilabo.front.service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
 import lombok.Data;
@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+
 
 @Data
 @Controller
@@ -42,11 +44,13 @@ public class NoteController {
         return "redirect:/patients/" + note.getPatId();
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public void deleteNote(@PathVariable String id) {
+
+    @PostMapping("/delete/{id}")
+    public String deleteNote(@PathVariable String id,
+                             @RequestParam Long patId) {
+
         noteService.delete(id);
+
+        return "redirect:/patients/" + patId;
     }
-
-
 }

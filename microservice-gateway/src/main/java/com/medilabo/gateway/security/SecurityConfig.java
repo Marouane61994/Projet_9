@@ -6,9 +6,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
@@ -16,14 +15,13 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // DelegatingPasswordEncoder — encodera avec {bcrypt} par défaut
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public MapReactiveUserDetailsService userDetailsService(PasswordEncoder encoder) {
         return new MapReactiveUserDetailsService(
-                User.withUsername("user")
+                User.withUsername("technical_user_gateway")
                         .password(encoder.encode("password"))
                         .roles("USER")
                         .build(),
@@ -39,12 +37,8 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                // Exemple : autoriser les routes internes si tu veux ; sinon commente/retire permitAll
                 .authorizeExchange(ex -> ex
                         .pathMatchers("/public/**").permitAll()
-                        // si tu veux permettre l'accès aux microservices via gateway sans auth côté gateway,
-                        // tu peux permitAll sur /<microservice>/**. En général, mieux = protéger tout.
-                        //.pathMatchers("/patient-service/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

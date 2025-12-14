@@ -1,6 +1,6 @@
 package com.microservice_front.microservice_front.unitaire;
 
-import com.medilabo.front.Service.DiabetesService;
+import com.medilabo.front.service.DiabetesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

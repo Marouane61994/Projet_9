@@ -1,8 +1,8 @@
-package com.medilabo.front.Controller;
+package com.medilabo.front.controller;
 
-import com.medilabo.front.Service.DiabetesService;
-import com.medilabo.front.Service.NoteService;
-import com.medilabo.front.Service.PatientService;
+import com.medilabo.front.service.DiabetesService;
+import com.medilabo.front.service.NoteService;
+import com.medilabo.front.service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +46,16 @@ public class PatientController {
         Patient patient = patientService.getPatientById(id);
         List<Note> notes = noteService.getNotesByPatient(id);
 
-        // Récupération du rapport
         Map<String, Object> rapport = diabetesService.getDiabetesReport(id);
 
         model.addAttribute("patient", patient);
         model.addAttribute("notes", notes);
 
-        // Si rapport OK
         if (rapport != null) {
             model.addAttribute("age", rapport.get("age"));
             model.addAttribute("triggerCount", rapport.get("nombreDeclencheurs"));
             model.addAttribute("riskLevel", rapport.get("niveauRisque"));
         } else {
-            // Sinon valeurs par défaut
             model.addAttribute("age", "N/A");
             model.addAttribute("triggerCount", "N/A");
             model.addAttribute("riskLevel", "Indisponible");
@@ -66,8 +63,6 @@ public class PatientController {
 
         return "patient-details";
     }
-
-
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {

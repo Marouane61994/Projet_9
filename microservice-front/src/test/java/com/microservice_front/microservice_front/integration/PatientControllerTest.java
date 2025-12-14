@@ -1,9 +1,9 @@
 package com.microservice_front.microservice_front.integration;
 
-import com.medilabo.front.Controller.PatientController;
-import com.medilabo.front.Service.DiabetesService;
-import com.medilabo.front.Service.NoteService;
-import com.medilabo.front.Service.PatientService;
+import com.medilabo.front.controller.PatientController;
+import com.medilabo.front.service.DiabetesService;
+import com.medilabo.front.service.NoteService;
+import com.medilabo.front.service.PatientService;
 import com.medilabo.front.model.Note;
 import com.medilabo.front.model.Patient;
 import org.junit.jupiter.api.Test;

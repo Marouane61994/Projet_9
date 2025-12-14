@@ -1,4 +1,4 @@
-package com.medilabo.front.Service;
+package com.medilabo.front.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +25,11 @@ public class DiabetesService {
     }
 
 
-
     public Map getDiabetesReport(Long patientId) {
         LOGGER.info("Récupération du rapport de diabète");
         String url = baseUrl + "/assess/" + patientId;
 
-        String username = "user";
+        String username = "technical_user_gateway";
         String password = "password";
 
         String auth = username + ":" + password;

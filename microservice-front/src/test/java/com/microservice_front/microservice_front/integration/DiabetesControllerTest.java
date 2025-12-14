@@ -1,7 +1,7 @@
 package com.microservice_front.microservice_front.integration;
 
-import com.medilabo.front.Controller.DiabetesController;
-import com.medilabo.front.Service.DiabetesService;
+import com.medilabo.front.controller.DiabetesController;
+import com.medilabo.front.service.DiabetesService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

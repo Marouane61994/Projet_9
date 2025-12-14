@@ -37,7 +37,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/patientdb
       SPRING_DATASOURCE_USERNAME: medilabo
       SPRING_DATASOURCE_PASSWORD: medipass
-      SERVER_PORT: 8081 # Ajout pour clarifier
+      SERVER_PORT: 8081
     ports:
       - "8081:8081"
     networks:

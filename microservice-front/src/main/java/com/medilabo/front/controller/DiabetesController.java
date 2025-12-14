@@ -1,7 +1,7 @@
-package com.medilabo.front.Controller;
+package com.medilabo.front.controller;
 
 
-import com.medilabo.front.Service.DiabetesService;
+import com.medilabo.front.service.DiabetesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class DiabetesController {
 
     @GetMapping("/patients/{id}/assess")
     public String getDiabetesReport(@PathVariable Long id, Model model) {
-        Map<String, Object> report = diabetesService.getDiabetesReport(id);
+        Map report = diabetesService.getDiabetesReport(id);
 
         if (report == null) {
             model.addAttribute("error", "Impossible de récupérer le rapport de diabète pour ce patient.");

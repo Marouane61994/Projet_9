@@ -1,4 +1,4 @@
-package com.medilabo.front.Service;
+package com.medilabo.front.service;
 
 import com.medilabo.front.model.Note;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +19,9 @@ public class NoteService {
     public NoteService(RestClient.Builder builder,
                        @Value("${gateway.url}") String gatewayUrl) {
 
+        String authString = "technical_user_gateway:password";
         String basicAuth = Base64.getEncoder()
-                .encodeToString("user:password".getBytes(StandardCharsets.UTF_8));
+                .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
 
         this.restClient = builder
                 .baseUrl(gatewayUrl + "/note-service")
@@ -38,7 +39,7 @@ public class NoteService {
     }
     public void save(Note note) {
         restClient.post()
-                .uri("/notes")  // endpoint du microservice pour créer une note
+                .uri("/notes")
                 .body(note)
                 .retrieve()
                 .body(Note.class);

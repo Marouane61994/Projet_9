@@ -12,18 +12,17 @@ import java.util.Base64;
 public class RestClientConfig {
 
     @Bean
-    public RestClient restClient(RestClient.Builder builder,
-                                 @Value("${gateway.url}") String gatewayUrl) {
+    public RestClient restClient(@Value("${gateway.url}") String gatewayUrl) {
 
-        String username = "user";
+        String username = "technical_user_gateway";
         String password = "password";
 
-        String auth = username + ":" + password;
+        String authString = username + ":" + password;
         String basicAuth = Base64.getEncoder()
-                .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+                .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
         String authHeader = "Basic " + basicAuth;
 
-        return builder
+        return RestClient.builder()
                 .baseUrl(gatewayUrl)
                 .defaultHeader("Authorization", authHeader)
                 .build();
