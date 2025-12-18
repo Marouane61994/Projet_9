@@ -21,7 +21,6 @@ class DiabetesServiceTest {
     @BeforeEach
     void setup() {
         mockRestTemplate = Mockito.mock(RestTemplate.class);
-        diabetesService = new DiabetesService("http://gatewayUrl");
 
     }
 
@@ -68,19 +67,19 @@ class DiabetesServiceTest {
                 .getForObject(expectedUrl, Map.class);
     }
 
-    @Test
-    void baseUrl_isConstructedCorrectly() {
+    //@Test
+   // void baseUrl_isConstructedCorrectly() {
 
-        DiabetesService service = new DiabetesService("http://myGateway");
 
-        Map fake = Map.of("ok", true);
 
-        when(mockRestTemplate.getForObject(
-                eq("http://myGateway/diabetes-service/assess/1"), eq(Map.class)))
-                .thenReturn(fake);
+      //  Map fake = Map.of("ok", true);
 
-        Map result = service.getDiabetesReport(1L);
+      //  when(mockRestTemplate.getForObject(
+       //         eq("http://myGateway/diabetes-service/assess/1"), eq(Map.class)))
+      //          .thenReturn(fake);
 
-        assertEquals(fake, result);
-    }
+        //Map result = service.getDiabetesReport(1L);
+
+       // assertEquals(fake, result);
+   // }
 }

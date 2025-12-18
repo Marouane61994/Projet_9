@@ -1,5 +1,6 @@
-package com.medilabo.gateway.filter;// Ceci est une version simplifiée. Les filtres sont complexes à implémenter correctement.
+package com.medilabo.gateway.filter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -11,23 +12,28 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class InternalAuthFilter implements GlobalFilter, Ordered {
 
-    private static final Map<String, String> SERVICE_CREDENTIALS = Map.of(
-            "/patient-service", "technical_user_patient:password",
-            "/note-service", "technical_user_notes:password",
-            "/diabetes-service", "technical_user_diabetes:password"
-    );
+    private final Map<String, String> SERVICE_CREDENTIALS = new HashMap<>();
+
+    public InternalAuthFilter(
+            @Value("${auth.patient.username}:${auth.patient.password}") String patientCreds,
+            @Value("${auth.note.username}:${auth.note.password}") String noteCreds,
+            @Value("${auth.diabetes.username}:${auth.diabetes.password}") String diabetesCreds)
+    {
+        SERVICE_CREDENTIALS.put("/patient-service", patientCreds);
+        SERVICE_CREDENTIALS.put("/note-service", noteCreds);
+        SERVICE_CREDENTIALS.put("/diabetes-service", diabetesCreds);
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        String path = request.getURI().getPath();
+        String path = exchange.getRequest().getURI().getPath();
 
-        // Trouver le chemin de base du service
         String servicePath = SERVICE_CREDENTIALS.keySet().stream()
                 .filter(path::startsWith)
                 .findFirst()
@@ -35,29 +41,19 @@ public class InternalAuthFilter implements GlobalFilter, Ordered {
 
         if (servicePath != null) {
             String credentials = SERVICE_CREDENTIALS.get(servicePath);
-            String authHeader = getBasicAuthHeader(credentials);
+            String authHeader = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
-            // 1. Supprimer l'ancien en-tête (celui du Front-end)
-            ServerHttpRequest.Builder builder = request.mutate();
-            builder.headers(httpHeaders -> httpHeaders.remove(HttpHeaders.AUTHORIZATION));
+            ServerHttpRequest request = exchange.getRequest().mutate()
+                    .header(HttpHeaders.AUTHORIZATION, authHeader)
+                    .build();
 
-            // 2. Ajouter le nouvel en-tête pour le service interne
-            builder.header(HttpHeaders.AUTHORIZATION, authHeader);
-
-            return chain.filter(exchange.mutate().request(builder.build()).build());
+            return chain.filter(exchange.mutate().request(request).build());
         }
-
-        // Si non trouvé, continuer la chaîne de filtres (ex: appel public)
         return chain.filter(exchange);
-    }
-
-    private String getBasicAuthHeader(String credentials) {
-        String basicAuth = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-        return "Basic " + basicAuth;
     }
 
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE; // Exécuter ce filtre très tôt
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }

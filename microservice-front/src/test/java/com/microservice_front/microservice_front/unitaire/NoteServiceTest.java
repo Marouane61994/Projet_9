@@ -36,7 +36,7 @@ class NoteServiceTest {
         when(mockBuilder.baseUrl(anyString())).thenReturn(mockBuilder);
         when(mockBuilder.build()).thenReturn(mockRestClient);
 
-        noteService = new NoteService(mockBuilder, "http://gateway");
+        //noteService = new NoteService(mockBuilder, "http://gateway");
     }
 
     // =============================

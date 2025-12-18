@@ -30,7 +30,7 @@ public class DiabetesController {
         this.noteRepository = noteRepository;
     }
 
-    @GetMapping("/assess/{id}")
+    @GetMapping("/diabetes/{id}")
     public Map<String, Object> getAssessment(@PathVariable Long id) {
         Patient patient = patientRepository.getPatientById(id);
         List<Note> notes = noteRepository.getNotesByPatient(id);

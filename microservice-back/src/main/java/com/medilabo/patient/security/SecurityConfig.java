@@ -1,5 +1,6 @@
 package com.medilabo.patient.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${auth.patient.username}")
+    private String patientUsername;
+
+    @Value("${auth.patient.password}")
+    private String patientPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -24,8 +31,8 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
 
         UserDetails gatewayUser = User.builder()
-                .username("technical_user_patient")
-                .password(encoder.encode("password"))
+                .username(patientUsername)
+                .password(encoder.encode(patientPassword))
                 .roles("SERVICE_API")
                 .build();
 

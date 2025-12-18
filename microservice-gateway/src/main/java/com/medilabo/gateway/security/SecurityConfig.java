@@ -1,5 +1,6 @@
 package com.medilabo.gateway.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -13,32 +14,31 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${auth.gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${auth.gateway.password}")
+    private String gatewayPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     public MapReactiveUserDetailsService userDetailsService(PasswordEncoder encoder) {
         return new MapReactiveUserDetailsService(
-                User.withUsername("technical_user_gateway")
-                        .password(encoder.encode("password"))
-                        .roles("USER")
-                        .build(),
-                User.withUsername("admin")
-                        .password(encoder.encode("admin123"))
-                        .roles("ADMIN")
+                User.withUsername(gatewayUsername)
+                        .password(encoder.encode(gatewayPassword))
+                        .roles("GATEWAY")
                         .build()
         );
     }
 
-
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(ex -> ex
-                        .pathMatchers("/public/**").permitAll()
+                .authorizeExchange(exchanges -> exchanges
                         .anyExchange().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

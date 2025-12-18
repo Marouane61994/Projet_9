@@ -1,5 +1,6 @@
 package com.medilabo.front.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${auth.front.username}")
+    private String frontUsername;
+
+    @Value("${auth.front.password}")
+    private String frontPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -21,27 +28,20 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("admin123")) // Le mot de passe doit être encodé
-                .roles("ADMIN")
-                .build();
-
         UserDetails user = User.builder()
-                .username("technical_user_front")
-                .password(encoder.encode("password"))
-                .roles("USER")
+                .username(frontUsername)
+                .password(encoder.encode(frontPassword))
+                .roles("Service API")
                 .build();
 
-        return new InMemoryUserDetailsManager(admin, user);
+        return new InMemoryUserDetailsManager(user);
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**", "/js/**").permitAll()
+                        .requestMatchers("/css/**", "/images/**", "/js/**", "/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

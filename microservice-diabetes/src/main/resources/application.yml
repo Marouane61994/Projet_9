@@ -1,3 +1,4 @@
+
 server:
   port: 8084
 
@@ -5,5 +6,20 @@ spring:
   application:
     name: microservice-diabetes
 
+
 gateway:
   url: http://localhost:8083
+  patient:
+    url: http://localhost:8081
+  note:
+    url: http://localhost:8085
+
+
+auth:
+  gateway:
+    username: ${AUTH_GATEWAY_USERNAME:technical_user_gateway}
+    password: ${AUTH_GATEWAY_PASSWORD:password}
+
+  diabetes:
+    username: ${AUTH_DIABETES_USERNAME:technical_user_diabetes}
+    password: ${AUTH_DIABETES_PASSWORD:password}

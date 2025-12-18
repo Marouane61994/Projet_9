@@ -17,9 +17,11 @@ public class NoteService {
     private final RestClient restClient;
 
     public NoteService(RestClient.Builder builder,
-                       @Value("${gateway.url}") String gatewayUrl) {
+                       @Value("${gateway.url}") String gatewayUrl,
+                       @Value("${auth.gateway.username}") String gatewayUsername,
+                       @Value("${auth.gateway.password}") String gatewayPassword) {
 
-        String authString = "technical_user_gateway:password";
+        String authString = gatewayUsername + ":" + gatewayPassword;
         String basicAuth = Base64.getEncoder()
                 .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
 
@@ -37,6 +39,7 @@ public class NoteService {
                         .body(Note[].class))
         );
     }
+
     public void save(Note note) {
         restClient.post()
                 .uri("/notes")
@@ -51,7 +54,4 @@ public class NoteService {
                 .retrieve()
                 .toBodilessEntity();
     }
-
-
-
 }

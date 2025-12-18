@@ -1,15 +1,27 @@
+
 server:
   port: ${FRONT_PORT:8082}
 
 spring:
   application:
     name: front
+
   thymeleaf:
     cache: false
+
   main:
     allow-bean-definition-overriding: true
 
 gateway:
   url: http://localhost:8083
+
+auth:
+    front:
+      username: ${AUTH_FRONT_USERNAME:technical_user_front}
+      password: ${AUTH_FRONT_PASSWORD:password}
+
+    gateway:
+      username: ${AUTH_GATEWAY_USERNAME:technical_user_gateway}
+      password: ${AUTH_GATEWAY_PASSWORD:password}
 
 

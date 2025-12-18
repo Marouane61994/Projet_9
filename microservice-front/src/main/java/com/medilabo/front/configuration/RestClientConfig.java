@@ -11,26 +11,26 @@ import java.util.Base64;
 @Configuration
 public class RestClientConfig {
 
-    /**
-     * Crée un RestClient configuré pour appeler la Gateway avec l'authentification Basic Auth.
-     */
+    @Value("${gateway.url}")
+    private String gatewayUrl;
+
+    @Value("${auth.gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${auth.gateway.password}")
+    private String gatewayPassword;
+
     @Bean
-    public RestClient restClient(@Value("${gateway.url}") String gatewayUrl) {
+    public RestClient restClient() {
+        String authString = gatewayUsername + ":" + gatewayPassword;
 
-        // 🔑 1. Définition des identifiants techniques (ceux de la Gateway)
-        String username = "technical_user_gateway";
-        String password = "password";
-
-        // 2. Encodage de l'authentification Basic Auth (username:password) en Base64
-        String auth = username + ":" + password;
         String basicAuth = Base64.getEncoder()
-                .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+                .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
         String authHeader = "Basic " + basicAuth;
 
-        // 3. Configuration du RestClient avec le bon en-tête et l'URL de base
         return RestClient.builder()
-                .baseUrl(gatewayUrl) // http://localhost:8083 (ou l'URL de votre Gateway)
-                .defaultHeader("Authorization", authHeader) // Ajout de l'en-tête
+                .baseUrl(gatewayUrl)
+                .defaultHeader("Authorization", authHeader)
                 .build();
     }
 }

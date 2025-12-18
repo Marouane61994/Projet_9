@@ -32,9 +32,17 @@ spring:
 internal:
   base-url: http://localhost
 
+auth:
+  gateway:
+    username: ${AUTH_GATEWAY_USERNAME:technical_user_gateway}
+    password: ${AUTH_GATEWAY_PASSWORD:password}
+  patient:
+    username: ${AUTH_PATIENT_USERNAME:technical_user_patient}
+    password: ${AUTH_PATIENT_PASSWORD:password}
+  note:
+    username: ${AUTH_NOTE_USERNAME:technical_user_notes}
+    password: ${AUTH_NOTE_PASSWORD:password}
+  diabetes:
+    username: ${AUTH_DIABETES_USERNAME:technical_user_diabetes}
+    password: ${AUTH_DIABETES_PASSWORD:password}
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"

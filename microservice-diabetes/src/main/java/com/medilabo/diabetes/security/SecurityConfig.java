@@ -1,5 +1,6 @@
 package com.medilabo.diabetes.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${auth.diabetes.username}")
+    private String diabetesUsername;
+
+    @Value("${auth.diabetes.password}")
+    private String diabetesPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -24,10 +31,11 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
 
         UserDetails gatewayUser = User.builder()
-                .username("technical_user_diabetes")
-                .password(encoder.encode("password"))
+                .username(diabetesUsername)
+                .password(encoder.encode(diabetesPassword))
                 .roles("SERVICE_API")
                 .build();
+
 
         return new InMemoryUserDetailsManager(gatewayUser);
     }

@@ -11,15 +11,23 @@ import java.util.Base64;
 @Configuration
 public class RestClientConfig {
 
+    @Value("${gateway.url}")
+    private String gatewayUrl;
+
+    @Value("${auth.gateway.username}")
+    private String gatewayUsername;
+
+    @Value("${auth.gateway.password}")
+    private String gatewayPassword;
+
     @Bean
-    public RestClient restClient(@Value("${gateway.url}") String gatewayUrl) {
+    public RestClient restClient() {
 
-        String username = "technical_user_gateway";
-        String password = "password";
+        String authString = gatewayUsername + ":" + gatewayPassword;
 
-        String authString = username + ":" + password;
         String basicAuth = Base64.getEncoder()
                 .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
+
         String authHeader = "Basic " + basicAuth;
 
         return RestClient.builder()

@@ -1,11 +1,20 @@
+
 server:
   port: 8085
 
 spring:
+  application:
+    name: note-service
+
   data:
     mongodb:
       uri: mongodb://localhost:27017
       database: notesdb
+
+auth:
+    note:
+      username: ${AUTH_NOTES_USERNAME:technical_user_notes}
+      password: ${AUTH_NOTES_PASSWORD:password}
 
 logging:
   level:

@@ -19,25 +19,28 @@ public class DiabetesService {
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public DiabetesService(@Value("${gateway.url}") String gatewayUrl) {
+    private final String gatewayUsername;
+    private final String gatewayPassword;
+
+    public DiabetesService(
+            @Value("${gateway.url}") String gatewayUrl,
+            @Value("${auth.gateway.username}") String gatewayUsername,
+            @Value("${auth.gateway.password}") String gatewayPassword) {
         this.restTemplate = new RestTemplate();
         this.baseUrl = gatewayUrl + "/diabetes-service";
+        this.gatewayUsername = gatewayUsername;
+        this.gatewayPassword = gatewayPassword;
     }
 
-
     public Map getDiabetesReport(Long patientId) {
-        LOGGER.info("Récupération du rapport de diabète");
+        LOGGER.info("Récupération du rapport de diabète pour le patient ID: {}", patientId);
         String url = baseUrl + "/assess/" + patientId;
 
-        String username = "technical_user_gateway";
-        String password = "password";
-
-        String auth = username + ":" + password;
+        String auth = gatewayUsername + ":" + gatewayPassword;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-        String authHeader = "Basic " + encodedAuth;
 
         HttpHeaders headers = new HttpHeaders();
-       headers.set("Authorization", authHeader);
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuth);
 
         try {
             return restTemplate.exchange(
@@ -47,10 +50,8 @@ public class DiabetesService {
                     Map.class
             ).getBody();
         } catch (Exception e) {
-            LOGGER.error("Erreur pendant la récupération du rapport", e);
-            return null;
+            LOGGER.error("Erreur pendant la récupération du rapport pour le patient {}", patientId, e);
+            return Map.of("error", "Service indisponible");
         }
     }
-
 }
-

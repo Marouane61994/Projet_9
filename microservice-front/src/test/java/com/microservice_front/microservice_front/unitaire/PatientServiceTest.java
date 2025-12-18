@@ -37,7 +37,7 @@ class PatientServiceTest {
         when(mockBuilder.baseUrl(anyString())).thenReturn(mockBuilder);
         when(mockBuilder.build()).thenReturn(mockRestClient);
 
-        patientService = new PatientService(mockBuilder, "http://gateway");
+       // patientService = new PatientService(mockBuilder, "http://gateway");
     }
 
     // =============================
