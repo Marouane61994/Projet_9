@@ -75,7 +75,7 @@ public class DiabetesService {
     public String determineRiskLevel(String sex, int age, int triggerCount) {
         if (triggerCount == 0) return "None";
 
-        // --- Rendre la valeur 'sex' robuste ---
+
         // Extrait la première lettre en majuscule pour gérer "HOMME", "FEMME", "M", ou "F".
         String firstLetterSex = "";
         if (sex != null && !sex.isEmpty()) {

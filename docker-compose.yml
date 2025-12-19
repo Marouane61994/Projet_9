@@ -53,6 +53,8 @@ services:
       SERVER_PORT: ${NOTES_PORT}
       AUTH_NOTES_USERNAME: ${AUTH_NOTES_USERNAME}
       AUTH_NOTES_PASSWORD: ${AUTH_NOTES_PASSWORD}
+    ports:
+      - "8085:8085"
     network_mode: host
 
   diabetes:
