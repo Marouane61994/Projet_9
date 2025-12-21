@@ -1,4 +1,4 @@
-db = db.getSiblingDB('medilabo');
+db = db.getSiblingDB('notesdb');
 
 db.notes.insertMany([
   { "patId": 1, "patient": "TestNone", "note": "Le patient déclare qu'il se sent très bien. Poids égal ou inférieur au poids recommandé" },

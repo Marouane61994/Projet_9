@@ -23,9 +23,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-      - ./init-mongo:/docker-entrypoint-initdb.d
-
-
+      - ./init-mongo/init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
   back:
     build: ./microservice-back
     container_name: microservice-back

@@ -34,7 +34,7 @@ public class DiabetesService {
 
     public Map getDiabetesReport(Long patientId) {
         LOGGER.info("Récupération du rapport de diabète pour le patient ID: {}", patientId);
-        String url = baseUrl + "/assess/" + patientId;
+        String url = baseUrl + "/diabetes/" + patientId;
 
         String auth = gatewayUsername + ":" + gatewayPassword;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
