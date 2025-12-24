@@ -1,13 +1,9 @@
 package com.medilabo.diabetes.service;
 
 import com.medilabo.diabetes.model.Patient;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.client.RestClient;
-
-
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,9 +13,8 @@ public class PatientService {
 
     private final RestClient restClient;
 
-    public PatientService(RestClient.Builder builder,
-                          @Value("${gateway.url}") String gatewayUrl) {
-        this.restClient = builder.baseUrl(gatewayUrl + "/patient-service").build();
+    public PatientService(@Qualifier("patientRestClient") RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public List<Patient> getAllPatients() {
@@ -27,8 +22,8 @@ public class PatientService {
                 .uri("/patients")
                 .retrieve()
                 .body(Patient[].class);
-        assert patients != null;
-        return Arrays.asList(patients);
+
+        return patients != null ? Arrays.asList(patients) : List.of();
     }
 
     public Patient getPatientById(Long id) {
@@ -45,5 +40,4 @@ public class PatientService {
                 .retrieve()
                 .toBodilessEntity();
     }
-
 }

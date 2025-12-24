@@ -5,39 +5,47 @@ services:
     image: mysql:8.0
     container_name: mysql-db
     restart: always
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - medilabo
 
   mongodb:
     image: mongo:latest
     container_name: mongodb
     restart: always
+    networks:
+      - medilabo
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
       - ./init-mongo/init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+
   back:
     build: ./microservice-back
     container_name: microservice-back
     restart: always
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
       - db
     environment:
-      SPRING_DATASOURCE_URL: ${MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-      SERVER_PORT: 8081
-    ports:
-      - "8081:8081"
-    network_mode: host
+      - SERVER_PORT=${BACKEND_PORT}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - AUTH_PATIENTS_USERNAME=${AUTH_PATIENTS_USERNAME}
+      - AUTH_PATIENTS_PASSWORD=${AUTH_PATIENTS_PASSWORD}
+    networks:
+      - medilabo
 
   notes:
     build: ./microservice-notes
@@ -45,15 +53,17 @@ services:
     restart: always
     depends_on:
       - mongodb
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/${MONGO_DATABASE}
-      SPRING_APPLICATION_NAME: note-services
-      SERVER_PORT: ${NOTES_PORT}
-      AUTH_NOTES_USERNAME: ${AUTH_NOTES_USERNAME}
-      AUTH_NOTES_PASSWORD: ${AUTH_NOTES_PASSWORD}
     ports:
-      - "8085:8085"
-    network_mode: host
+      - "${NOTES_PORT}:${NOTES_PORT}"
+    environment:
+      - SERVER_PORT=${NOTES_PORT}
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=${MONGO_DATABASE}
+      - AUTH_NOTES_USERNAME=${AUTH_NOTES_USERNAME}
+      - AUTH_NOTES_PASSWORD=${AUTH_NOTES_PASSWORD}
+    networks:
+      - medilabo
 
   diabetes:
     build:
@@ -63,34 +73,51 @@ services:
     ports:
       - "${DIABETES_PORT}:${DIABETES_PORT}"
     environment:
-      - PATIENT_SERVICE_URL=https://microservice-back:${BACKEND_PORT}
-      - NOTE_SERVICE_URL=https://microservice-notes:${NOTES_PORT}
-      - PATIENT_SERVICE_USERNAME=${AUTH_PATIENT_USERNAME}
-      - PATIENT_SERVICE_PASSWORD=${AUTH_PATIENT_PASSWORD}
-      - NOTE_SERVICE_USERNAME=${AUTH_NOTES_USERNAME}
-      - NOTE_SERVICE_PASSWORD=${AUTH_NOTES_PASSWORD}
+      - SERVER_PORT=${DIABETES_PORT}
+      - PATIENTS_SERVICE_URL=${PATIENTS_SERVICE_URL}
+      - NOTES_SERVICE_URL=${NOTES_SERVICE_URL}
+      - GATEWAY_SERVICE_URL=${GATEWAY_SERVICE_URL}
+      - AUTH_GATEWAY_USERNAME=${AUTH_GATEWAY_USERNAME}
+      - AUTH_GATEWAY_PASSWORD=${AUTH_GATEWAY_PASSWORD}
+      - AUTH_PATIENTS_USERNAME=${AUTH_PATIENTS_USERNAME}
+      - AUTH_PATIENTS_PASSWORD=${AUTH_PATIENTS_PASSWORD}
+      - AUTH_NOTES_USERNAME=${AUTH_NOTES_USERNAME}
+      - AUTH_NOTES_PASSWORD=${AUTH_NOTES_PASSWORD}
+      - AUTH_DIABETES_USERNAME=${AUTH_DIABETES_USERNAME}
+      - AUTH_DIABETES_PASSWORD=${AUTH_DIABETES_PASSWORD}
     depends_on:
       - back
       - notes
-    network_mode: host
+    networks:
+      - medilabo
 
   gateway:
     build: ./microservice-gateway
     container_name: microservice-gateway
+    hostname: gateway
     restart: always
     depends_on:
       - back
       - notes
       - diabetes
-
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     environment:
-      - PATIENT_CREDENTIALS=${AUTH_PATIENT_USERNAME}:${AUTH_PATIENT_PASSWORD}
-      - auth.service.note.credentials=${AUTH_NOTES_USERNAME}:${AUTH_NOTES_PASSWORD}
-      - auth.service.diabetes.credentials=${AUTH_DIABETES_USERNAME}:${AUTH_DIABETES_PASSWORD}
-      - auth.service.front.credentials=${AUTH_FRONT_USERNAME}:${AUTH_FRONT_PASSWORD}
-    network_mode: host
+      - SERVER_PORT=${GATEWAY_PORT}
+      - GATEWAY_SERVICE_URL=${GATEWAY_SERVICE_URL}
+      - PATIENTS_SERVICE_URL=${PATIENTS_SERVICE_URL}
+      - NOTES_SERVICE_URL=${NOTES_SERVICE_URL}
+      - DIABETES_SERVICE_URL=${DIABETES_SERVICE_URL}
+      - AUTH_GATEWAY_USERNAME=${AUTH_GATEWAY_USERNAME}
+      - AUTH_GATEWAY_PASSWORD=${AUTH_GATEWAY_PASSWORD}
+      - AUTH_PATIENTS_USERNAME=${AUTH_PATIENTS_USERNAME}
+      - AUTH_PATIENTS_PASSWORD=${AUTH_PATIENTS_PASSWORD}
+      - AUTH_NOTES_USERNAME=${AUTH_NOTES_USERNAME}
+      - AUTH_NOTES_PASSWORD=${AUTH_NOTES_PASSWORD}
+      - AUTH_DIABETES_USERNAME=${AUTH_DIABETES_USERNAME}
+      - AUTH_DIABETES_PASSWORD=${AUTH_DIABETES_PASSWORD}
+    networks:
+      - medilabo
 
   front:
     build: ./microservice-front
@@ -98,16 +125,26 @@ services:
     restart: always
     depends_on:
       - gateway
+      - mongodb
     environment:
-      GATEWAY_URL: http://gateway:${GATEWAY_PORT}
-      SERVER_PORT: ${FRONTEND_PORT}
-      FRONT_SERVICE_USERNAME: ${AUTH_FRONT_USERNAME}
-      FRONT_SERVICE_PASSWORD: ${AUTH_FRONT_PASSWORD}
+      - SERVER_PORT=${FRONTEND_PORT}
+      - GATEWAY_SERVICE_URL=${GATEWAY_SERVICE_URL}
+      - AUTH_GATEWAY_USERNAME=${AUTH_GATEWAY_USERNAME}
+      - AUTH_GATEWAY_PASSWORD=${AUTH_GATEWAY_PASSWORD}
+      - AUTH_FRONT_USERNAME=${AUTH_FRONT_USERNAME}
+      - AUTH_FRONT_PASSWORD=${AUTH_FRONT_PASSWORD}
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=${MONGO_DATABASE}
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-    network_mode: host
+    networks:
+      - medilabo
+
+networks:
+  medilabo:
+    driver: bridge
 
 volumes:
   db_data:
   mongo_data:
-

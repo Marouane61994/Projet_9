@@ -28,12 +28,7 @@ class NoteServiceTest {
     @BeforeEach
     void setUp() throws Exception {
 
-        noteService = new NoteService(
-                RestClient.builder(),
-                "http://localhost:8083",
-                "user",
-                "pass"
-        );
+
 
 
         Field field = NoteService.class.getDeclaredField("restClient");

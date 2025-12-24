@@ -18,7 +18,7 @@ public class DiabetesController {
         this.diabetesService = diabetesService;
     }
 
-    @GetMapping("/patients/{id}/assess")
+    @GetMapping("/patients/{id}/diabetes")
     public String getDiabetesReport(@PathVariable Long id, Model model) {
         Map report = diabetesService.getDiabetesReport(id);
 

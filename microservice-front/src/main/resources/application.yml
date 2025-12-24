@@ -1,6 +1,5 @@
-
 server:
-  port: ${FRONT_PORT:8082}
+  port: ${FRONTEND_PORT}
 
 spring:
   application:
@@ -13,15 +12,14 @@ spring:
     allow-bean-definition-overriding: true
 
 gateway:
-  url: http://localhost:8083
+  url: ${GATEWAY_SERVICE_URL}
 
 auth:
-    front:
-      username: ${AUTH_FRONT_USERNAME:technical_user_front}
-      password: ${AUTH_FRONT_PASSWORD:password}
+  front:
+    username: ${AUTH_FRONT_USERNAME}
+    password: ${AUTH_FRONT_PASSWORD}
 
-    gateway:
-      username: ${AUTH_GATEWAY_USERNAME:technical_user_gateway}
-      password: ${AUTH_GATEWAY_PASSWORD:password}
-
+  gateway:
+    username: ${AUTH_GATEWAY_USERNAME}
+    password: ${AUTH_GATEWAY_PASSWORD}
 

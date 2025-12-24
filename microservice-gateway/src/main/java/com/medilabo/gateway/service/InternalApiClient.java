@@ -18,21 +18,20 @@ public class InternalApiClient {
     private final RestTemplate restTemplate = new RestTemplate();
     private final Map<String, String> SERVICE_CREDENTIALS = new HashMap<>();
 
-    @Value("${internal.base-url}")
+    @Value("${internal.base-url:${GATEWAY_SERVICE_URL}}")
     private String internalBaseUrl;
 
     public InternalApiClient(
-            @Value("${auth.patient.username}:${auth.patient.password}") String patientCreds,
-            @Value("${auth.note.username}:${auth.note.password}") String noteCreds,
+            @Value("${auth.patients.username}:${auth.patients.password}") String patientCreds,
+            @Value("${auth.notes.username}:${auth.notes.password}") String noteCreds,
             @Value("${auth.diabetes.username}:${auth.diabetes.password}") String diabetesCreds) {
 
-        SERVICE_CREDENTIALS.put("/patient-service", patientCreds);
-        SERVICE_CREDENTIALS.put("/note-service", noteCreds);
+        SERVICE_CREDENTIALS.put("/patients-service", patientCreds);
+        SERVICE_CREDENTIALS.put("/notes-service", noteCreds);
         SERVICE_CREDENTIALS.put("/diabetes-service", diabetesCreds);
     }
 
     public Object sendRequest(String servicePath, String uri, HttpMethod method, Object body, Class<?> responseType) {
-
         String credentials = SERVICE_CREDENTIALS.get(servicePath);
         if (credentials == null) {
             throw new IllegalArgumentException("Service path non reconnu: " + servicePath);
@@ -42,6 +41,7 @@ public class InternalApiClient {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicAuth);
+
 
         String fullUrl = internalBaseUrl + servicePath + uri;
 

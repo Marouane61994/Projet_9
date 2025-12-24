@@ -21,12 +21,12 @@ public class InternalAuthFilter implements GlobalFilter, Ordered {
     private final Map<String, String> SERVICE_CREDENTIALS = new HashMap<>();
 
     public InternalAuthFilter(
-            @Value("${auth.patient.username}:${auth.patient.password}") String patientCreds,
-            @Value("${auth.note.username}:${auth.note.password}") String noteCreds,
+            @Value("${auth.patients.username}:${auth.patients.password}") String patientCreds,
+            @Value("${auth.notes.username}:${auth.notes.password}") String noteCreds,
             @Value("${auth.diabetes.username}:${auth.diabetes.password}") String diabetesCreds)
     {
-        SERVICE_CREDENTIALS.put("/patient-service", patientCreds);
-        SERVICE_CREDENTIALS.put("/note-service", noteCreds);
+        SERVICE_CREDENTIALS.put("/patients-service", patientCreds);
+        SERVICE_CREDENTIALS.put("/notes-service", noteCreds);
         SERVICE_CREDENTIALS.put("/diabetes-service", diabetesCreds);
     }
 

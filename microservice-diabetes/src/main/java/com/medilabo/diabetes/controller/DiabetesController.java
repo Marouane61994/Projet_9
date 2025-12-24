@@ -2,9 +2,9 @@ package com.medilabo.diabetes.controller;
 
 import com.medilabo.diabetes.model.Note;
 import com.medilabo.diabetes.model.Patient;
-import com.medilabo.diabetes.repository.NoteRepository;
-import com.medilabo.diabetes.repository.PatientRepository;
 import com.medilabo.diabetes.service.DiabetesService;
+import com.medilabo.diabetes.service.NoteService;
+import com.medilabo.diabetes.service.PatientService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,25 +15,26 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
-@RequestMapping("")
 public class DiabetesController {
 
     private final DiabetesService diabetesService;
-    private final PatientRepository patientRepository;
-    private final NoteRepository noteRepository;
+    private final PatientService patientService;
+    private final NoteService noteService;
 
-    public DiabetesController(DiabetesService diabetesService, PatientRepository patientRepository, NoteRepository noteRepository) {
+    public DiabetesController(DiabetesService diabetesService,
+                              PatientService patientService,
+                              NoteService noteService) {
         this.diabetesService = diabetesService;
-        this.patientRepository = patientRepository;
-        this.noteRepository = noteRepository;
+        this.patientService = patientService;
+        this.noteService = noteService;
     }
 
-    @GetMapping("/diabetes/{id}")
+    @GetMapping("/assessment/{id}")
     public Map<String, Object> getAssessment(@PathVariable Long id) {
-        Patient patient = patientRepository.getPatientById(id);
-        List<Note> notes = noteRepository.getNotesByPatient(id);
+
+        Patient patient = patientService.getPatientById(id);
+        List<Note> notes = noteService.getNotesByPatient(id);
 
         int nombreDeclencheurs = diabetesService.countTriggers(notes);
         int age = diabetesService.calculateAge(LocalDate.parse(patient.getDateNaissance()));

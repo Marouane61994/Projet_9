@@ -1,34 +1,30 @@
 package com.medilabo.diabetes.service;
 
-
 import com.medilabo.diabetes.model.Note;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class NoteService {
 
     private final RestClient restClient;
 
-    public NoteService(RestClient.Builder builder,
-                       @Value("${gateway.url}") String gatewayUrl) {
-        this.restClient = builder
-                .baseUrl(gatewayUrl + "/note-service")
-                .build();
+    public NoteService(@Qualifier("noteRestClient") RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public List<Note> getNotesByPatient(Long patId) {
-        return Arrays.asList(
-                Objects.requireNonNull(restClient.get()
-                        .uri("/notes/patient/{patId}", patId)
-                        .retrieve()
-                        .body(Note[].class))
-        );
+        Note[] notes = restClient.get()
+                // L'URI est relative à la baseUrl définie dans RestClientConfig
+                .uri("/notes/patient/{patId}", patId)
+                .retrieve()
+                .body(Note[].class);
+
+        return notes != null ? Arrays.asList(notes) : List.of();
     }
 
     public void save(Note note) {
@@ -36,7 +32,7 @@ public class NoteService {
                 .uri("/notes")
                 .body(note)
                 .retrieve()
-                .body(Note.class);
+                .toBodilessEntity();
     }
 
     public void delete(String id) {
@@ -45,6 +41,4 @@ public class NoteService {
                 .retrieve()
                 .toBodilessEntity();
     }
-
-
 }

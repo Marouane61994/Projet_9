@@ -33,7 +33,7 @@ public class SecurityConfig {
         UserDetails gatewayUser = User.builder()
                 .username(diabetesUsername)
                 .password(encoder.encode(diabetesPassword))
-                .roles("SERVICE_API")
+                .roles("Diabetes")
                 .build();
 
 

@@ -5,34 +5,40 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 @Configuration
 public class RestClientConfig {
 
-    @Value("${gateway.url}")
-    private String gatewayUrl;
+    @Value("${patients.service.url}")
+    private String patientServiceUrl;
 
-    @Value("${auth.gateway.username}")
-    private String gatewayUsername;
+    @Value("${notes.service.url}")
+    private String noteServiceUrl;
 
-    @Value("${auth.gateway.password}")
-    private String gatewayPassword;
+    @Value("${auth.patient.username}")
+    private String patientUsername;
+
+    @Value("${auth.patient.password}")
+    private String patientPassword;
+
+    @Value("${auth.note.username}")
+    private String noteUsername;
+
+    @Value("${auth.note.password}")
+    private String notePassword;
 
     @Bean
-    public RestClient restClient() {
-
-        String authString = gatewayUsername + ":" + gatewayPassword;
-
-        String basicAuth = Base64.getEncoder()
-                .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
-
-        String authHeader = "Basic " + basicAuth;
-
+    public RestClient patientRestClient() {
         return RestClient.builder()
-                .baseUrl(gatewayUrl)
-                .defaultHeader("Authorization", authHeader)
+                .baseUrl(patientServiceUrl)
+                .defaultHeaders(headers -> headers.setBasicAuth(patientUsername, patientPassword))
+                .build();
+    }
+
+    @Bean
+    public RestClient noteRestClient() {
+        return RestClient.builder()
+                .baseUrl(noteServiceUrl)
+                .defaultHeaders(headers -> headers.setBasicAuth(noteUsername, notePassword))
                 .build();
     }
 }

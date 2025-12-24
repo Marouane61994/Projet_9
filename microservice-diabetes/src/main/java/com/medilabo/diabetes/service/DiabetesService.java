@@ -76,13 +76,10 @@ public class DiabetesService {
         if (triggerCount == 0) return "None";
 
 
-        // Extrait la première lettre en majuscule pour gérer "HOMME", "FEMME", "M", ou "F".
         String firstLetterSex = "";
         if (sex != null && !sex.isEmpty()) {
             firstLetterSex = sex.toUpperCase(Locale.ROOT).substring(0, 1);
         }
-        // ------------------------------------
-
         if (age > 30) {
             // Règles pour les patients de plus de 30 ans
             if (triggerCount >= 8) return "Early onset";

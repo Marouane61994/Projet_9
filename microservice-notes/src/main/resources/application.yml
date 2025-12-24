@@ -1,6 +1,5 @@
-
 server:
-  port: ${SERVER_PORT:8085}
+  port: ${NOTES_PORT}
 
 spring:
   application:
@@ -8,14 +7,10 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_HOST:localhost}:27017
-      database: notesdb
+      uri: mongodb://mongodb:27017/${MONGO_DATABASE}
+      database: ${MONGO_DATABASE}
 
 auth:
   note:
-    username: ${AUTH_NOTES_USERNAME:technical_user_notes}
-    password: ${AUTH_NOTES_PASSWORD:password}
-
-logging:
-  level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    username: ${AUTH_NOTES_USERNAME}
+    password: ${AUTH_NOTES_PASSWORD}

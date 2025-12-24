@@ -20,10 +20,9 @@ public class RestClientConfig {
     @Value("${auth.gateway.password}")
     private String gatewayPassword;
 
-    @Bean
+    @Bean(name = "gatewayRestClient")
     public RestClient restClient() {
         String authString = gatewayUsername + ":" + gatewayPassword;
-
         String basicAuth = Base64.getEncoder()
                 .encodeToString(authString.getBytes(StandardCharsets.UTF_8));
         String authHeader = "Basic " + basicAuth;

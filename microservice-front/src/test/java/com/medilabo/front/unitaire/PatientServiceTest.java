@@ -27,12 +27,7 @@ class PatientServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        patientService = new PatientService(
-                RestClient.builder(),
-                "http://localhost:8083",
-                "admin",
-                "password"
-        );
+
 
         Field field = PatientService.class.getDeclaredField("restClient");
         field.setAccessible(true);
