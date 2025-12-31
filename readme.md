@@ -1,45 +1,45 @@
-A/ Recommandations Green Code
+# 🏥 Medilabo Solutions - Système de Prévention du Diabète
 
-1. Compréhension des enjeux
-   Le Green Code (ou écoconception logicielle) n'est pas qu'une question d'écologie, c'est une démarche d'efficience technique.
+Ce projet est une application basée sur une **architecture microservices** permettant le suivi des patients, la gestion des notes cliniques et l'évaluation des risques de diabète.
 
-- Objectif principal : Réduire l'empreinte environnementale du logiciel en optimisant la consommation des ressources (CPU, RAM, stockage) tout au long de son cycle de vie.
+---
 
-- Enjeux clés :
+## 🛠 Configuration de l'Environnement
 
-   * Réduction énergétique : Moins de cycles CPU = moins de consommation électrique dans les datacenters.
+Le projet utilise des variables d'environnement pour orchestrer la communication entre les microservices et sécuriser les accès aux bases de données. Un fichier `.env` est requis à la racine du projet.
 
-   * Durabilité matérielle : Un code léger permet de faire durer les serveurs et les terminaux plus longtemps avant qu'ils ne deviennent obsolètes.
-
-   * Sobriété : Éviter le "gras numérique" en ne développant que les fonctionnalités essentielles.
-
-
-
-2. Identification des gisements d'optimisation
-   Pour identifier les parties du code qui consomment de la mémoire inutilement, nous utilisons :
-
-- Profilage (Profiling) : Utilisation d'outils comme VisualVM ou JProfiler pour détecter les fuites de mémoire (memory leaks) et les objets qui stagnent dans la Heap.
-
-- Analyse Statique : Outils comme SonarQube pour repérer les boucles inefficaces ou les instanciations d'objets redondantes.
-
-- Docker Stats : Surveillance de la consommation réelle des conteneurs pour ajuster les ressources allouées.
+| Catégorie | Clé | Description |
+| :--- | :--- | :--- |
+| **Réseau** | `PORT_XXX` | Définit les ports d'exposition pour la Gateway (8083), le Front (8082) et les services métier (8081, 8084, 8085). |
+| **Persistance SQL** | `MYSQL_ROOT_PASSWORD` | Mot de passe administrateur pour l'instance MySQL (données patients). |
+| | `MYSQL_DATABASE` | Nom de la base de données relationnelle (`patientdb`). |
+| **Persistance NoSQL**| `MONGO_DATABASE` | Nom de la base de données MongoDB pour le stockage des notes cliniques. |
+| **Sécurité (Auth)** | `AUTH_XXX_USERNAME` | Identifiants techniques utilisés pour l'authentification "Service-to-Service" via Spring Security. |
+| **Service Discovery**| `XXX_SERVICE_URL` | URLs internes permettant aux services de communiquer entre eux (ex: via le réseau Docker). |
 
 
+## 🌿 Engagement Green Code & Éco-conception
 
-3. Pistes d'amélioration pour le projet Medilabo
-   Même si ces principes ne sont pas appliqués immédiatement, voici une analyse critique du projet actuel :
+Dans le cadre du développement, une attention particulière a été portée à la **sobriété numérique** (réduction de la consommation CPU/RAM et optimisation du cycle de vie matériel).
 
-B/ Infrastructure & Docker
-- Images Light : Passer de l'image openjdk:17 à des images Alpine (openjdk:17-alpine) pour réduire la taille des images disque de ~300Mo à ~100Mo.
+### 🚀 Optimisation de l'Infrastructure
+* **Images Légères** : Utilisation de distributions **Alpine Linux** (`openjdk:17-alpine`) pour réduire l'empreinte disque et le temps de transfert réseau.
+* **Limitation des Ressources** : Configuration de `limits` CPU et RAM dans le fichier `docker-compose.yml` pour garantir la stabilité de l'hôte.
 
-- Limitation des ressources : Ajouter des deploy.resources.limits dans le docker-compose.yml pour empêcher un microservice de monopoliser le CPU de l'hôte.
+### 💻 Efficience du Code
+* **Pagination** : Mise en œuvre de la pagination pour éviter les surcharges de mémoire vive lors de la récupération des listes de patients.
+* **Désactivation des Auto-configs** : Optimisation du temps de démarrage (boot time) en excluant les dépendances inutilisées (ex: exclusion de JPA dans les services NoSQL).
 
-C/ Architecture Microservices
-- Désactivation des auto-configurations : Dans le microservice-front, désactiver explicitement les configurations MongoDB et JPA inutilisées pour accélérer le démarrage (réduction du temps de CPU au boot).
+### 📡 Gestion des Flux
+* **Mise en cache** : Utilisation d'un cache local pour limiter les appels réseau redondants.
+* **DTO (Data Transfer Objects)** : Filtrage des données transférées pour ne véhiculer que le strict nécessaire.
 
-- Pagination : Implémenter la pagination sur l'affichage des listes de patients pour éviter de charger des centaines d'objets en mémoire vive si la base de données grandit.
+---
 
-D/ Communications
-- Mise en cache : Utiliser un cache local (Caffeine) dans le DiabetesService pour les rapports déjà générés, évitant ainsi de solliciter inutilement la Gateway et les microservices Notes/Patient à chaque rafraîchissement de page.
+## 🚀 Lancement du projet
 
-- JSON sélectif : Ne transférer que les champs nécessaires entre les services (Data Transfer Objects) au lieu d'envoyer l'objet complet.
+1. **Clonage du dépôt** : `git clone <https://github.com/Marouane61994/Projet_9.git>`
+2. **Configuration** : Remplir le fichier `.env.exemple` à la racine à partir des clés listées ci-dessus.
+3. **Exécution** :
+   ```bash
+   docker-compose up --build

@@ -46,7 +46,7 @@ public class PatientController {
         Patient patient = patientService.getPatientById(id);
         List<Note> notes = noteService.getNotesByPatient(id);
 
-        Map<String, Object> rapport = diabetesService.getDiabetesReport(id);
+        Map rapport = diabetesService.getDiabetesReport(id);
 
         model.addAttribute("patient", patient);
         model.addAttribute("notes", notes);
