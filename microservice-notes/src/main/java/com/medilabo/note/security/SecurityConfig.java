@@ -15,6 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Configuration de la sécurité pour le microservice Note.
+ * * ROLE :
+ * Ce service gère les accès aux notes cliniques stockées dans MongoDB.
+ * Il n'accepte que les requêtes authentifiées provenant de la Gateway,
+ * garantissant que les données sensibles des patients ne sont pas exposées
+ * directement sur le réseau.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -25,11 +33,20 @@ public class SecurityConfig {
     @Value("${auth.notes.password}")
     private String notePassword;
 
+    /**
+     * Bean de hachage BCrypt.
+     * Utilisé pour comparer de manière sécurisée les identifiants techniques
+     * reçus via la Gateway avec ceux stockés en mémoire.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configuration de l'utilisateur technique autorisé (Service-to-Service).
+     * Le rôle "SERVICE_API" identifie les appels provenant de l'infrastructure interne.
+     */
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         UserDetails gatewayUser = User.builder()
@@ -41,6 +58,12 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(gatewayUser);
     }
 
+    /**
+     * Chaîne de filtres de sécurité :
+     * - CSRF : Désactivé car l'API est stateless (sans session).
+     * - Authorization : Authentification obligatoire pour tous les endpoints (/notes/**).
+     * - HttpBasic : Réception des credentials encodés en Base64 par la Gateway.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -48,7 +71,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
-
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

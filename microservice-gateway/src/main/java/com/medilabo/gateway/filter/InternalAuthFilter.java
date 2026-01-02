@@ -15,6 +15,17 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Filtre de sécurité global pour la Gateway Medilabo.
+ * * ROLE :
+ * Ce filtre intercepte les requêtes entrantes et injecte dynamiquement un header
+ * d'authentification Basic (Base64) avant de transmettre la requête aux microservices.
+ * * POURQUOI CETTE MÉTHODE ?
+ * 1. Sécurité "Service-to-Service" : Empêche l'accès direct aux microservices sans passer par la Gateway.
+ * 2. Encodage Base64 : Standard HTTP pour l'authentification Basic, permettant de transmettre
+ * des identifiants techniques (username:password) de manière structurée dans les headers.
+ * 3. Centralisation : Le Front n'a pas besoin de connaître les secrets de chaque microservice.
+ */
 @Component
 public class InternalAuthFilter implements GlobalFilter, Ordered {
 
@@ -34,6 +45,7 @@ public class InternalAuthFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
+        // Identification du service cible basé sur le chemin d'URL
         String servicePath = SERVICE_CREDENTIALS.keySet().stream()
                 .filter(path::startsWith)
                 .findFirst()
@@ -41,17 +53,26 @@ public class InternalAuthFilter implements GlobalFilter, Ordered {
 
         if (servicePath != null) {
             String credentials = SERVICE_CREDENTIALS.get(servicePath);
+
+            // Génération du header "Basic Auth" (Encodage Base64 du couple user:password)
+            // Cela transforme "user:pass" en une chaîne sécurisée pour le transport HTTP
             String authHeader = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
+            // Mutation de la requête pour ajouter le header d'autorisation
             ServerHttpRequest request = exchange.getRequest().mutate()
                     .header(HttpHeaders.AUTHORIZATION, authHeader)
                     .build();
 
             return chain.filter(exchange.mutate().request(request).build());
         }
+
         return chain.filter(exchange);
     }
 
+    /**
+     * Définit la priorité du filtre.
+     * HIGHEST_PRECEDENCE assure que l'authentification est ajoutée avant tout autre traitement.
+     */
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;

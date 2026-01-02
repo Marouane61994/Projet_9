@@ -22,24 +22,36 @@ Le projet utilise des variables d'environnement pour orchestrer la communication
 
 Dans le cadre du développement, une attention particulière a été portée à la **sobriété numérique** (réduction de la consommation CPU/RAM et optimisation du cycle de vie matériel).
 
-### 🚀 Optimisation de l'Infrastructure
-* **Images Légères** : Utilisation de distributions **Alpine Linux** (`openjdk:17-alpine`) pour réduire l'empreinte disque et le temps de transfert réseau.
-* **Limitation des Ressources** : Configuration de `limits` CPU et RAM dans le fichier `docker-compose.yml` pour garantir la stabilité de l'hôte.
+ - Réalisé (Implémenté)
+    * Optimisation des algorithmes : Normalisation des "triggers" de diagnostic dans le constructeur des services pour éviter des calculs redondants à chaque requête.
 
-### 💻 Efficience du Code
-* **Pagination** : Mise en œuvre de la pagination pour éviter les surcharges de mémoire vive lors de la récupération des listes de patients.
-* **Désactivation des Auto-configs** : Optimisation du temps de démarrage (boot time) en excluant les dépendances inutilisées (ex: exclusion de JPA dans les services NoSQL).
+    * DNS Interne Docker : Utilisation du réseau bridge de Docker pour une résolution d'hôte efficace sans passer par le réseau externe.
 
-### 📡 Gestion des Flux
-* **Mise en cache** : Utilisation d'un cache local pour limiter les appels réseau redondants.
-* **DTO (Data Transfer Objects)** : Filtrage des données transférées pour ne véhiculer que le strict nécessaire.
+    * Pagination : Mise en œuvre de la pagination sur les listes de patients pour limiter la charge RAM et la bande passante.
 
----
+    * Désactivation des Auto-configs : Optimisation du boot time en excluant les dépendances inutilisées (ex: exclusion de MongoDB dans le microservice Patient).
+
+ - Pistes d'amélioration (Backlog)
+    * Images Alpine : Migration progressive vers des images openjdk:17-alpine pour réduire l'empreinte disque de 60%.
+
+    * Mise en cache (Redis) : Projet d'implémentation d'un cache distribué pour les scores de risques déjà calculés.
+
+    * DTO (Data Transfer Objects) : Filtrage plus granulaire des données pour ne transférer que les champs requis par le Front-end.
 
 ## 🚀 Lancement du projet
 
-1. **Clonage du dépôt** : `git clone <https://github.com/Marouane61994/Projet_9.git>`
-2. **Configuration** : Remplir le fichier `.env.exemple` à la racine à partir des clés listées ci-dessus.
+1. **Clonage du dépôt** : `git clone https://github.com/Marouane61994/Projet_9.git
+2. **Configuration** : Copier le fichier .env.example et le renommer en .env à la racine du projet, puis remplir les variables nécessaires.
 3. **Exécution** :
    ```bash
    docker-compose up --build
+
+## 🏗 Architecture & Modélisation
+
+Bases de données
+
+Le projet utilise une approche hybride (Polyglot Persistence) :
+
+  - MySQL (Relationnel) : Utilisé pour les données patients. Le schéma est conçu en 3NF (Troisième Forme Normale) pour garantir l'intégrité des données et éliminer les redondances transitives.
+
+  - MongoDB (NoSQL) : Utilisé pour les notes cliniques, offrant la flexibilité nécessaire pour stocker des rapports médicaux de longueurs et formats variables.
