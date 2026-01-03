@@ -100,14 +100,19 @@ class DiabetesServiceTest {
 
     @Test
     void testAssessRisk_EarlyOnset_YoungFemale_SevenTriggers() {
-        // Femme de 28 ans (née en 1997)
+        // Femme de 28 ans (en 2026)
         mockPatient.setDateNaissance("1997-01-01");
         mockPatient.setGenre("F");
+
+        // Ajout d'un 5ème argument (null ou la version minuscules) pour respecter le constructeur
         List<Note> notes = Arrays.asList(
-                new Note(null, 1L, null, "Poids"), new Note(null, 1L, null, "Taille"),
-                new Note(null, 1L, null, "Vertige"), new Note(null, 1L, null, "Anormal"),
-                new Note(null, 1L, null, "Cholestérol"), new Note(null, 1L, null, "Microalbumine"),
-                new Note(null, 1L, null, "Anticorps")
+                new Note(null, 1L, null, "Poids", "poids"),
+                new Note(null, 1L, null, "Taille", "taille"),
+                new Note(null, 1L, null, "Vertige", "vertige"),
+                new Note(null, 1L, null, "Anormal", "anormal"),
+                new Note(null, 1L, null, "Cholestérol", "cholestérol"),
+                new Note(null, 1L, null, "Microalbumine", "microalbumine"),
+                new Note(null, 1L, null, "Anticorps", "anticorps")
         );
 
         when(patientRepository.getPatientById(1L)).thenReturn(mockPatient);

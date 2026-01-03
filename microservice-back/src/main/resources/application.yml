@@ -11,17 +11,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+      show-sql: false
+    open-in-view: false
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+     hibernate:
+        format_sql: true
 
   sql:
     init:
       mode: always
       continue-on-error: true
       data-locations: classpath:data.sql
-      defer-datasource-initialization: true
+      jpa.defer-datasource-initialization: true
 
 auth:
   patient:
