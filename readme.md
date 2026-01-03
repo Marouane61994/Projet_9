@@ -32,7 +32,7 @@ Dans le cadre du développement, une attention particulière a été portée à 
     * Désactivation des Auto-configs : Optimisation du boot time en excluant les dépendances inutilisées (ex: exclusion de MongoDB dans le microservice Patient).
 
  - Pistes d'amélioration (Backlog)
-    * Images Alpine : Migration progressive vers des images openjdk:17-alpine pour réduire l'empreinte disque de 60%.
+    * Images: Migration progressive vers des images pour réduire l'empreinte disque de 60%.
 
     * Mise en cache (Redis) : Projet d'implémentation d'un cache distribué pour les scores de risques déjà calculés.
 
