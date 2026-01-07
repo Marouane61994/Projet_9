@@ -26,4 +26,5 @@ public class NoteRepository {
 
         return Arrays.asList(Objects.requireNonNullElse(notes, new Note[0]));
     }
+
 }

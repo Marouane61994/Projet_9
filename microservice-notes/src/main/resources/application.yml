@@ -1,6 +1,9 @@
 server:
   port: ${NOTES_PORT}
 
+  error:
+    include-message: always
+
 spring:
   application:
     name: note-service
@@ -14,3 +17,7 @@ auth:
   note:
     username: ${AUTH_NOTES_USERNAME}
     password: ${AUTH_NOTES_PASSWORD}
+
+  patient:
+    username: ${AUTH_PATIENTS_USERNAME}
+    password: ${AUTH_PATIENTS_PASSWORD}
